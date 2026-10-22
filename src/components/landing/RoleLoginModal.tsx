@@ -34,13 +34,22 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+
+    if (!cleanEmail || !cleanPassword) {
+      setError('Please enter both your institutional email and password.');
+      return;
+    }
+
     setLoading(true);
     clearLoginStageMetrics();
 
     try {
       await login({
-        email: email || getDefaultEmail(selectedRole),
-        password: password || 'password123',
+        email: cleanEmail,
+        password: cleanPassword,
         role: selectedRole,
       });
       onClose();
@@ -192,6 +201,7 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
               <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <input
                 type="email"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={getDefaultEmail(selectedRole)}
@@ -206,6 +216,7 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
               <input
                 type="password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password or mentor phone number"

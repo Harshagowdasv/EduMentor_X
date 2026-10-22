@@ -23,7 +23,8 @@ export const app = isFirebaseConfigured
   : null;
 
 export const auth = app ? getAuth(app) : null;
-export const db = app ? getFirestore(app) : null;
+const firestoreDbId = (env.VITE_FIREBASE_DATABASE_ID as string) || 'default';
+export const db = app ? getFirestore(app, firestoreDbId) : null;
 export const storage = app ? getStorage(app) : null;
 
 // Shared Firestore connection health & circuit-breaker state across Auth and Database services

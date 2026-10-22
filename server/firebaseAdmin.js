@@ -14,6 +14,7 @@ let isInitialized = false;
 let credentialError = null;
 
 const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || 'edumentorx-ab2e1';
+const firestoreDbId = process.env.FIRESTORE_DATABASE_ID || process.env.VITE_FIREBASE_DATABASE_ID || 'default';
 
 try {
   if (getApps().length === 0) {
@@ -70,7 +71,7 @@ try {
         projectId,
       });
       adminAuth = getAuth(adminApp);
-      adminDb = getFirestore(adminApp);
+      adminDb = getFirestore(adminApp, firestoreDbId);
       isInitialized = true;
       console.log('[Firebase Admin SDK] Initialized successfully.');
       console.log(`[Firebase Admin SDK] Target Project ID: ${projectId}`);
@@ -81,7 +82,7 @@ try {
   } else {
     adminApp = getApp();
     adminAuth = getAuth(adminApp);
-    adminDb = getFirestore(adminApp);
+    adminDb = getFirestore(adminApp, firestoreDbId);
     isInitialized = true;
   }
 } catch (err) {
