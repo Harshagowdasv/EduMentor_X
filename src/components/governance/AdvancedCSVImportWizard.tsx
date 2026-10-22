@@ -134,7 +134,7 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
       {activeTab === 'import' ? (
         <div className="space-y-6">
           {/* Top Actions */}
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight">Institutional Student Data Import</h3>
@@ -144,7 +144,7 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
 
               <button
                 onClick={handleDownloadTemplate}
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700"
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700 shrink-0 self-start sm:self-auto"
               >
                 <Download className="w-4 h-4 text-indigo-400" /> Download Canonical CSV Template
               </button>
@@ -154,12 +154,12 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
             <div className="p-6 border-2 border-dashed border-slate-800 hover:border-indigo-600 rounded-2xl bg-slate-950/60 text-center space-y-2 transition-colors">
               <Upload className="w-8 h-8 text-indigo-400 mx-auto" />
               <p className="text-xs font-bold text-white">Choose CSV File to Import</p>
-              <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer" />
+              <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer max-w-full" />
             </div>
 
             {/* Config duplicate strategy */}
             {csvRows.length > 0 && (
-              <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs">
                 <span className="text-slate-300 font-bold">Duplicate USN Strategy:</span>
                 <select
                   value={duplicateStrategy}

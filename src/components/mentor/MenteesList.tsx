@@ -153,8 +153,8 @@ export const MenteesList: React.FC<MenteesListProps> = ({
         {loading ? (
           <div className="p-8 text-center text-xs text-slate-400">Loading mentees list...</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse text-xs min-w-[660px]">
               <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">USN</th>
@@ -185,7 +185,7 @@ export const MenteesList: React.FC<MenteesListProps> = ({
                         {s.riskLevel.replace('_', ' ')}
                       </span>
                     </td>
-                    <td className="p-4 text-right space-x-1.5">
+                    <td className="p-4 text-right whitespace-nowrap space-x-1.5">
                       <button
                         onClick={() => onViewStudent360(s.id)}
                         className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all inline-flex items-center gap-1"

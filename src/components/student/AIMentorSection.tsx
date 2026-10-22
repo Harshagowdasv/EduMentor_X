@@ -208,7 +208,7 @@ export const AIMentorSection: React.FC<AIMentorSectionProps> = ({ student }) => 
                 className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-md p-3.5 rounded-2xl space-y-1 ${
+                  className={`max-w-[85%] sm:max-w-md p-3.5 rounded-2xl space-y-1 ${
                     m.role === 'user'
                       ? 'bg-indigo-600 text-white rounded-br-none shadow-md'
                       : 'bg-slate-950 text-slate-200 border border-slate-800 rounded-bl-none'
@@ -241,7 +241,7 @@ export const AIMentorSection: React.FC<AIMentorSectionProps> = ({ student }) => 
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={`Ask ${avatarName} about study plans, project code, or time management...`}
-              className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
+              className="flex-1 min-w-0 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
             />
             <button
               type="submit"

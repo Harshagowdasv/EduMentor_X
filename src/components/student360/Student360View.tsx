@@ -78,19 +78,19 @@ export const Student360View: React.FC<Student360ViewProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Student 360° Profile — ${student ? student.name : 'Loading'}`} maxWidth="6xl">
-      <div className="space-y-6 text-xs max-h-[82vh] overflow-y-auto pr-1">
+      <div className="space-y-6 text-xs max-h-[calc(100dvh-7rem)] sm:max-h-[82vh] overflow-y-auto pr-1">
         {loading || !student ? (
           <div className="p-8 text-center text-xs text-slate-400">Loading Student 360° Profile...</div>
         ) : (
           <>
             {/* Header Info Card */}
-            <div className="p-5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-600 font-extrabold text-white text-xl flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-600 font-extrabold text-white text-lg sm:text-xl flex items-center justify-center shadow-lg shadow-indigo-600/30 shrink-0">
                   {student.name.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                     {student.name} <span className="text-xs text-slate-400 font-mono">({student.usn})</span>
                   </h3>
                   <p className="text-xs text-slate-400">
@@ -99,7 +99,7 @@ export const Student360View: React.FC<Student360ViewProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
                 <span
                   className={`px-3 py-1 text-xs font-bold uppercase rounded-lg border ${
                     student.riskLevel === 'GOOD_PERFORMANCE'
@@ -115,10 +115,10 @@ export const Student360View: React.FC<Student360ViewProps> = ({
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto no-scrollbar">
               <button
                 onClick={() => setActiveTab('overview')}
-                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
                   activeTab === 'overview' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -127,7 +127,7 @@ export const Student360View: React.FC<Student360ViewProps> = ({
 
               <button
                 onClick={() => setActiveTab('biodata')}
-                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
                   activeTab === 'biodata' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -137,7 +137,7 @@ export const Student360View: React.FC<Student360ViewProps> = ({
               {userRole !== 'student' && (
                 <button
                   onClick={() => setActiveTab('interventions')}
-                  className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
                     activeTab === 'interventions' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -147,7 +147,7 @@ export const Student360View: React.FC<Student360ViewProps> = ({
 
               <button
                 onClick={() => setActiveTab('ia-marks')}
-                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
                   activeTab === 'ia-marks' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -156,7 +156,7 @@ export const Student360View: React.FC<Student360ViewProps> = ({
 
               <button
                 onClick={() => setActiveTab('timeline')}
-                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
                   activeTab === 'timeline' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -370,8 +370,8 @@ export const Student360View: React.FC<Student360ViewProps> = ({
                     <p className="text-slate-500 text-[11px]">Admin can import subject-wise IA marks via the IA Marks Import tool.</p>
                   </div>
                 ) : (
-                  <div className="border border-slate-800 rounded-xl overflow-hidden">
-                    <table className="w-full text-left text-xs">
+                  <div className="border border-slate-800 rounded-xl overflow-x-auto no-scrollbar">
+                    <table className="w-full text-left text-xs min-w-[640px]">
                       <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 font-semibold">
                         <tr>
                           <th className="p-3">Term</th>

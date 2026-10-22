@@ -37,11 +37,11 @@ export const SmartMentorRecommendations: React.FC<SmartMentorRecommendationsProp
   };
 
   return (
-    <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+    <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-            <Flame className="w-5 h-5 text-amber-400" />
+            <Flame className="w-5 h-5 text-amber-400 shrink-0" />
             Students Needing Urgent Mentor Attention
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">Ranked using transparent explainable risk indicators and interaction recency</p>
@@ -59,14 +59,14 @@ export const SmartMentorRecommendations: React.FC<SmartMentorRecommendationsProp
           {needingAttention.map((st, idx) => (
             <div
               key={st.id}
-              className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+              className="p-3.5 sm:p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-slate-700 transition-colors"
             >
               <div className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-slate-800 text-indigo-400 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                   {idx + 1}
                 </span>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h4 className="font-bold text-white text-sm">{st.name}</h4>
                     <span className="text-xs text-slate-400">({st.usn})</span>
                     <span

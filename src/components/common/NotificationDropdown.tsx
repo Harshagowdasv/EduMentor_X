@@ -69,7 +69,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-x-3.5 top-16 sm:absolute sm:inset-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-96 max-w-sm bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 mx-auto sm:mx-0">
           <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
             <h4 className="font-bold text-sm text-white flex items-center gap-2">
               <Bell className="w-4 h-4 text-indigo-400" /> Notifications ({unreadCount} Unread)

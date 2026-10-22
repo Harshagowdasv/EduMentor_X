@@ -145,14 +145,14 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
   return (
     <div className="space-y-6 text-xs">
       {/* COMMAND CENTER HEADER BANNER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-950 border border-indigo-800/60 shadow-xl">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-600 font-extrabold text-white text-2xl flex items-center justify-center shadow-lg shadow-indigo-600/40 shrink-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-slate-950 border border-indigo-800/60 shadow-xl">
+        <div className="flex items-center gap-3.5 sm:gap-4">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-indigo-600 font-extrabold text-white text-xl sm:text-2xl flex items-center justify-center shadow-lg shadow-indigo-600/40 shrink-0">
             {mentorName.charAt(0)}
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold text-white tracking-tight">Mentor Command Center</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">Mentor Command Center</h2>
               <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full bg-indigo-900/80 text-indigo-300 border border-indigo-700/60 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-indigo-400" /> Active Session
               </span>
@@ -163,7 +163,7 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
           <div className="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 text-xs flex items-center gap-2">
             <Users className="w-4 h-4 text-indigo-400" />
             <span>Mentees:</span>
@@ -183,14 +183,14 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
       <MentorActionCenter onNavigate={onNavigate} />
 
       {/* PRIORITIZED "NEEDS YOUR ATTENTION TODAY" HERO SECTION */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-amber-950/70 border border-rose-800/80 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-amber-950/70 border border-rose-800/80 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-rose-600 text-white shadow-md">
+            <div className="p-2 rounded-lg bg-rose-600 text-white shadow-md shrink-0">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 What Needs Your Attention Today?
               </h3>
               <p className="text-xs text-slate-300">Prioritized high-risk mentees, overdue tasks, and open interventions</p>
@@ -198,7 +198,7 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
           </div>
 
           <span
-            className={`px-3 py-1 text-xs font-bold uppercase rounded-lg border ${
+            className={`px-3 py-1 text-xs font-bold uppercase rounded-lg border self-start sm:self-auto shrink-0 ${
               totalUrgentAttentionCount > 0
                 ? 'bg-rose-950 text-rose-300 border-rose-800 shadow-rose-900/30'
                 : 'bg-emerald-950 text-emerald-300 border-emerald-800'
@@ -387,7 +387,7 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
       </div>
 
       {/* MENTEE PORTFOLIO DIRECTORY TABLE */}
-      <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div>
             <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
@@ -397,15 +397,15 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
           </div>
 
           {/* Search & Filter Bar */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-48">
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
               <input
                 type="text"
                 placeholder="Search mentee..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
+                className="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-white text-xs focus:outline-none focus:border-indigo-500"
               />
             </div>
 

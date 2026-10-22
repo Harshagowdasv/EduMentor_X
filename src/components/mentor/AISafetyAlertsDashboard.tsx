@@ -95,8 +95,8 @@ export const AISafetyAlertsDashboard: React.FC<AISafetyAlertsDashboardProps> = (
             No confidential AI safety alerts logged for your assigned mentees.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse text-xs min-w-[650px]">
               <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Timestamp</th>

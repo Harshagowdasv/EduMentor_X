@@ -69,11 +69,11 @@ export const StudentGoalTracker: React.FC<StudentGoalTrackerProps> = ({ studentI
   };
 
   return (
-    <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-            <Target className="w-5 h-5 text-indigo-400" />
+            <Target className="w-5 h-5 text-indigo-400 shrink-0" />
             Academic, Career & Coding Goal Tracker
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">Set milestones, monitor progress, and get faculty mentor feedback</p>
@@ -82,7 +82,7 @@ export const StudentGoalTracker: React.FC<StudentGoalTrackerProps> = ({ studentI
         {userRole === 'student' && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/30"
+            className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-600/30 self-start sm:self-auto shrink-0"
           >
             <Plus className="w-4 h-4" /> Add New Goal
           </button>

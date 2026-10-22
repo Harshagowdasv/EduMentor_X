@@ -124,18 +124,18 @@ export const CareerPortfolioBuilder: React.FC<CareerPortfolioBuilderProps> = ({ 
       <ProfileCompletenessGauge completeness={portfolio.profileCompleteness} suggestions={portfolio.missingSuggestions} />
 
       {/* Resume Section */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800">
-            <FileText className="w-6 h-6" />
+          <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800 shrink-0">
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <h3 className="font-bold text-white text-sm">Curriculum Vitae / Resume Document</h3>
-            <p className="text-xs text-slate-400">{portfolio.resumeName || 'No resume uploaded yet'}</p>
+            <p className="text-xs text-slate-400 truncate max-w-xs">{portfolio.resumeName || 'No resume uploaded yet'}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
           {portfolio.resumeUrl && (
             <a
               href={portfolio.resumeUrl}
@@ -163,7 +163,7 @@ export const CareerPortfolioBuilder: React.FC<CareerPortfolioBuilderProps> = ({ 
       </div>
 
       {/* Projects Section */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-white text-sm uppercase tracking-wider flex items-center gap-2">
             <FolderGit2 className="w-4 h-4 text-indigo-400" /> Technical Projects ({portfolio.projects.length})

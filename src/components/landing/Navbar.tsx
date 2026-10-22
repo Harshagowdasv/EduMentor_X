@@ -17,24 +17,24 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLogin, onNavigateSection }
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-sky-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-300">
-            <GraduationCap className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
+          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-sky-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-300 shrink-0">
+            <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-extrabold text-white tracking-tight font-sans">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-xl sm:text-2xl font-extrabold text-white tracking-tight font-sans">
                 EduMentor<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-sky-400">X</span>
               </span>
               {isDemoMode && (
-                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-indigo-900/60 text-indigo-300 border border-indigo-700/50 rounded-full">
-                  Demo Mode
+                <span className="px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-indigo-900/60 text-indigo-300 border border-indigo-700/50 rounded-full">
+                  Demo
                 </span>
               )}
             </div>
-            <p className="text-[10px] text-slate-400 font-medium tracking-wide">AI-POWERED STUDENT MANAGEMENT</p>
+            <p className="text-[9px] sm:text-[10px] text-slate-400 font-medium tracking-wide">AI-POWERED STUDENT MANAGEMENT</p>
           </div>
         </div>
 

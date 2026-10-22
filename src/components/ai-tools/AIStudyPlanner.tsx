@@ -95,14 +95,14 @@ export const AIStudyPlanner: React.FC<AIStudyPlannerProps> = ({ student }) => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border border-indigo-800/80 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border border-indigo-800/80 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/40">
-              <Sparkles className="w-6 h-6 animate-pulse" />
+            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 shrink-0">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">AI Personalized Daily Study Planner</h2>
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">AI Personalized Daily Study Planner</h2>
               <p className="text-xs text-slate-300">Generates optimal study routines tailored to your exam target and available hours</p>
             </div>
           </div>
@@ -110,7 +110,7 @@ export const AIStudyPlanner: React.FC<AIStudyPlannerProps> = ({ student }) => {
           <button
             onClick={handleGeneratePlan}
             disabled={generating}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all"
+            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 flex items-center gap-2 transition-all self-start sm:self-auto shrink-0"
           >
             <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
             {generating ? 'Generating AI Schedule...' : 'Generate New Study Plan'}

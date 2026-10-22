@@ -191,10 +191,10 @@ export const AcademicRiskEarlyWarning: React.FC<AcademicRiskEarlyWarningProps> =
           </div>
 
           {/* Risk Level Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 md:pb-0">
             <button
               onClick={() => setRiskFilter('ALL')}
-              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs shrink-0 whitespace-nowrap transition-colors ${
                 riskFilter === 'ALL' ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
@@ -202,7 +202,7 @@ export const AcademicRiskEarlyWarning: React.FC<AcademicRiskEarlyWarningProps> =
             </button>
             <button
               onClick={() => setRiskFilter('HIGH_PRIORITY')}
-              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs shrink-0 whitespace-nowrap transition-colors ${
                 riskFilter === 'HIGH_PRIORITY' ? 'bg-rose-600 text-white shadow-sm' : 'bg-slate-950 text-rose-400 hover:text-white border border-slate-800'
               }`}
             >
@@ -210,7 +210,7 @@ export const AcademicRiskEarlyWarning: React.FC<AcademicRiskEarlyWarningProps> =
             </button>
             <button
               onClick={() => setRiskFilter('NEEDS_MONITORING')}
-              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs shrink-0 whitespace-nowrap transition-colors ${
                 riskFilter === 'NEEDS_MONITORING' ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-950 text-amber-400 hover:text-white border border-slate-800'
               }`}
             >
@@ -218,7 +218,7 @@ export const AcademicRiskEarlyWarning: React.FC<AcademicRiskEarlyWarningProps> =
             </button>
             <button
               onClick={() => setRiskFilter('GOOD_PERFORMANCE')}
-              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-colors ${
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs shrink-0 whitespace-nowrap transition-colors ${
                 riskFilter === 'GOOD_PERFORMANCE' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-950 text-emerald-400 hover:text-white border border-slate-800'
               }`}
             >
@@ -382,7 +382,7 @@ export const AcademicRiskEarlyWarning: React.FC<AcademicRiskEarlyWarningProps> =
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2 pt-1 justify-end">
+              <div className="flex flex-wrap items-center gap-2 pt-1 justify-end">
                 <button
                   onClick={() => onViewStudent360(st.id)}
                   className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors"

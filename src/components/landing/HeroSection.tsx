@@ -21,7 +21,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenLogin }) => {
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-sans leading-[1.1]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-sans leading-[1.15] sm:leading-[1.1]">
             Smarter Mentorship.{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-300 to-sky-400">
               Stronger Students.
@@ -29,7 +29,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenLogin }) => {
           </h1>
 
           {/* Subheading */}
-          <p className="mt-6 text-lg sm:text-xl text-slate-300 max-w-2xl font-normal leading-relaxed">
+          <p className="mt-4 sm:mt-6 text-sm sm:text-lg md:text-xl text-slate-300 max-w-2xl font-normal leading-relaxed">
             EduMentorX connects students, mentors, and administrators in one unified platform — featuring intelligent allocation, permanent mentorship logs, explainable risk analytics, and an AI avatar mentor.
           </p>
 
@@ -78,8 +78,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenLogin }) => {
         {/* Dynamic Graphic Dashboard Mockup Preview */}
         <div className="mt-16 relative mx-auto max-w-5xl">
           <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-sky-500 opacity-20 blur-xl"></div>
-          <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl p-6 sm:p-8 backdrop-blur-xl">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 shadow-2xl p-4 sm:p-6 md:p-8 backdrop-blur-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* Card 1 */}
               <div className="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-start gap-4">
                 <div className="p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800/50">

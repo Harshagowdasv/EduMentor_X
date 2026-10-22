@@ -59,7 +59,7 @@ export const MentorDetailPage: React.FC<MentorDetailPageProps> = ({
       </button>
 
       {/* Mentor Profile Summary Card */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
             {mentor.name.charAt(0)}
@@ -115,8 +115,8 @@ export const MentorDetailPage: React.FC<MentorDetailPageProps> = ({
         ) : mentees.length === 0 ? (
           <div className="p-8 text-center text-xs text-slate-400">No students currently allocated to this mentor.</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse text-xs min-w-[650px]">
               <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                   <th className="p-3.5">USN</th>

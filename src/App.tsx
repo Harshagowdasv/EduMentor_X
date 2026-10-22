@@ -75,6 +75,7 @@ const MainApp: React.FC = () => {
 
   // Dashboard Active Navigation Section
   const [activeSection, setActiveSection] = useState('overview');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Shared Modals State
   const [selectedStudent360Id, setSelectedStudent360Id] = useState<string | null>(null);
@@ -221,6 +222,8 @@ const MainApp: React.FC = () => {
         onOpenGlobalSearch={() => setIsGlobalSearchOpen(true)}
         onLogout={logout}
         userName={user.name}
+        isOpenMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
@@ -232,10 +235,11 @@ const MainApp: React.FC = () => {
           department={user.department}
           avatarUrl={user.avatarUrl}
           onNavigateSection={(sec) => setActiveSection(sec)}
+          onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         />
         <DemoDiagnosticPanel />
 
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full space-y-6">
+        <main className="flex-1 p-3.5 sm:p-5 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full space-y-4 sm:space-y-6">
           {/* ADMIN PORTAL SECTIONS */}
           {user.role === 'admin' && (
             <>

@@ -106,9 +106,9 @@ export const FollowUpTaskManager: React.FC<FollowUpTaskManagerProps> = ({ userRo
       </div>
 
       {/* Task Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         {tasks.map((task) => (
-          <div key={task.id} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+          <div key={task.id} className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <div className="flex items-start justify-between">
               <span
                 className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded ${

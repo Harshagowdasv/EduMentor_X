@@ -66,56 +66,56 @@ export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> =
   return (
     <div className="space-y-6">
       {/* Top Academic Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800/50">
-            <GraduationCap className="w-6 h-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800/50 shrink-0">
+            <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Cumulative CGPA</p>
-            <p className="text-2xl font-bold text-white mt-1">{student.cgpa.toFixed(2)}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{student.cgpa.toFixed(2)}</p>
             <span className="text-[11px] text-indigo-400 font-semibold">Scale 0 - 10.0</span>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-800/50">
-            <TrendingUp className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-950 text-emerald-400 border border-emerald-800/50 shrink-0">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Lecture Attendance</p>
-            <p className="text-2xl font-bold text-white mt-1">{student.attendance}%</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{student.attendance}%</p>
             <span className={`text-[11px] font-semibold ${student.attendance >= 75 ? 'text-emerald-400' : 'text-rose-400'}`}>
               {student.attendance >= 75 ? 'Meets requirement' : 'Below 75%'}
             </span>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-purple-950 text-purple-400 border border-purple-800/50">
-            <Clock className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-purple-950 text-purple-400 border border-purple-800/50 shrink-0">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Weekly Study Hours</p>
-            <p className="text-2xl font-bold text-white mt-1">{student.studyHours} hrs</p>
-            <span className="text-[11px] text-purple-300 font-semibold">Self-reported Discipline</span>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{student.studyHours} hrs</p>
+            <span className="text-[11px] text-purple-300 font-semibold">Self-reported</span>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-amber-950 text-amber-400 border border-amber-800/50">
-            <AlertTriangle className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-amber-950 text-amber-400 border border-amber-800/50 shrink-0">
+            <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Active Backlogs</p>
-            <p className="text-2xl font-bold text-white mt-1">{student.previousYearBacklogs}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{student.previousYearBacklogs}</p>
             <span className="text-[11px] text-slate-400">Previous semesters</span>
           </div>
         </div>
       </div>
 
       {/* ACADEMIC PERFORMANCE — IA MARKS SECTION */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div>
             <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -176,8 +176,8 @@ export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> =
 
         {/* DATA TABLE */}
         {!loadingMarks && !marksError && filteredMarks.length > 0 && (
-          <div className="border border-slate-800 rounded-xl overflow-hidden">
-            <table className="w-full text-left text-xs">
+          <div className="border border-slate-800 rounded-xl overflow-x-auto no-scrollbar">
+            <table className="w-full text-left text-xs min-w-[620px]">
               <thead className="bg-slate-950 text-slate-400 border-b border-slate-800 font-semibold">
                 <tr>
                   <th className="p-3">Academic Term</th>

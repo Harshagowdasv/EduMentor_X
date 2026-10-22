@@ -64,14 +64,14 @@ export const AIResumeAssistant: React.FC<AIResumeAssistantProps> = ({ student })
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 border border-purple-800/80 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 border border-purple-800/80 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/40">
-              <FileCheck className="w-6 h-6" />
+            <div className="p-2.5 sm:p-3 rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-600/40 shrink-0">
+              <FileCheck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">AI Interactive Resume Assistant</h2>
+              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">AI Interactive Resume Assistant</h2>
               <p className="text-xs text-slate-300">Automated resume audit, scoring, and placement improvement recommendations</p>
             </div>
           </div>
@@ -79,7 +79,7 @@ export const AIResumeAssistant: React.FC<AIResumeAssistantProps> = ({ student })
           <button
             onClick={handleAnalyzeResume}
             disabled={analyzing}
-            className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all"
+            className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 flex items-center gap-2 transition-all self-start sm:self-auto shrink-0"
           >
             <Sparkles className={`w-4 h-4 ${analyzing ? 'animate-spin' : ''}`} />
             {analyzing ? 'Analyzing Resume...' : 'Analyze Resume'}
@@ -95,18 +95,18 @@ export const AIResumeAssistant: React.FC<AIResumeAssistantProps> = ({ student })
           Click "Analyze Resume" above to perform an AI resume audit.
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Resume Score Card */}
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-center space-y-3">
+          <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col items-center justify-center text-center space-y-3">
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Overall Resume Score</h3>
-            <div className="w-28 h-28 rounded-full border-4 border-purple-500 bg-purple-950/40 flex items-center justify-center">
-              <span className="text-3xl font-extrabold text-white">{analysis.score} <span className="text-xs text-slate-400 font-normal">/ 100</span></span>
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-purple-500 bg-purple-950/40 flex items-center justify-center">
+              <span className="text-2xl sm:text-3xl font-extrabold text-white">{analysis.score} <span className="text-xs text-slate-400 font-normal">/ 100</span></span>
             </div>
             <p className="text-xs text-emerald-400 font-semibold">Strong Professional Foundation</p>
           </div>
 
           {/* Actionable Suggestions & Missing Sections */}
-          <div className="lg:col-span-2 p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="lg:col-span-2 p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">Actionable Improvement Suggestions</h3>
 
             <div className="space-y-2">

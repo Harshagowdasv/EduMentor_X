@@ -204,14 +204,14 @@ export const MentorManagement: React.FC<MentorManagementProps> = ({ onSelectMent
       </div>
 
       {/* Mentors Table */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         {loading ? (
           <div className="text-center py-12 text-slate-500 text-xs font-semibold">Loading institutional mentor records...</div>
         ) : filteredMentors.length === 0 ? (
           <div className="text-center py-12 text-slate-500 text-xs">No faculty mentors found matching your filters.</div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-800">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto rounded-xl border border-slate-800 no-scrollbar">
+            <table className="w-full text-left border-collapse text-xs min-w-[700px]">
               <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase font-bold text-[11px] tracking-wider">
                 <tr>
                   <th className="p-4">Staff ID</th>

@@ -83,7 +83,7 @@ export const MentorWorkloadAnalytics: React.FC = () => {
       </div>
 
       {/* Workload Comparison Bar Chart */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <h3 className="text-xs font-bold text-white uppercase tracking-wider">
           Mentee Allocation Comparison per Faculty Mentor
         </h3>
@@ -103,11 +103,11 @@ export const MentorWorkloadAnalytics: React.FC = () => {
       </div>
 
       {/* Mentor Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
         {workloadData.map((m, idx) => (
           <div
             key={idx}
-            className={`p-5 rounded-2xl border space-y-3 transition-all ${
+            className={`p-4 sm:p-5 rounded-2xl border space-y-3 transition-all ${
               m.isOverloaded ? 'bg-rose-950/20 border-rose-800/80' : 'bg-slate-900 border-slate-800'
             }`}
           >

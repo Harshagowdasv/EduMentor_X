@@ -65,11 +65,11 @@ export const MentorEffectiveness: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <UserCheck className="w-5 h-5 text-indigo-400 shrink-0" />
               Faculty Mentorship Operational Activity & Progress Metrics
             </h2>
             <p className="text-xs text-slate-400 mt-1">Measurable operational metrics on meeting completion rates, task follow-ups, and student feedback</p>
@@ -78,9 +78,9 @@ export const MentorEffectiveness: React.FC = () => {
       </div>
 
       {/* Metrics Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
         {metrics.map((m, idx) => (
-          <div key={idx} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h4 className="font-bold text-white text-sm">{m.mentor.name}</h4>

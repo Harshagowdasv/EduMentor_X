@@ -17,24 +17,24 @@ export const SystemHealthDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-              <Activity className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <Activity className="w-5 h-5 text-emerald-400 shrink-0" />
               Institutional System Health & Service Monitor
             </h2>
             <p className="text-xs text-slate-400 mt-1">Real-time status check across database, authentication, storage, and AI providers</p>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 font-bold text-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 font-bold text-xs self-start sm:self-auto">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
             All Institutional Systems Operational
           </div>
         </div>
 
         {isDemo && (
-          <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/60 text-xs text-indigo-300 flex items-center justify-between">
+          <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/60 text-xs text-indigo-300 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <span>
               <strong>DEMO ENVIRONMENT ACTIVE</strong>: Operating on client-side <strong>IndexedDB</strong> persistence layer.
             </span>
@@ -45,7 +45,7 @@ export const SystemHealthDashboard: React.FC = () => {
                   window.location.reload();
                 }
               }}
-              className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px]"
+              className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-[11px] self-start sm:self-auto shrink-0"
             >
               Reset Seed Data
             </button>

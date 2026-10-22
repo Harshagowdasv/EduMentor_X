@@ -83,57 +83,57 @@ export const AdminDashboardOverview: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Overview Top Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800/50">
-            <UserCheck className="w-6 h-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800/50 shrink-0">
+            <UserCheck className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Total Mentors</p>
-            <p className="text-2xl font-bold text-white mt-1">{totalMentors}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{totalMentors}</p>
             <span className="text-[11px] text-emerald-400 font-semibold">Active Faculty</span>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-purple-950 text-purple-400 border border-purple-800/50">
-            <Users className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-purple-950 text-purple-400 border border-purple-800/50 shrink-0">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Total Students</p>
-            <p className="text-2xl font-bold text-white mt-1">{totalStudents}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{totalStudents}</p>
             <span className="text-[11px] text-indigo-300 font-semibold">{allocatedStudents} Allocated</span>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-amber-950 text-amber-400 border border-amber-800/50">
-            <UserX className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-amber-950 text-amber-400 border border-amber-800/50 shrink-0">
+            <UserX className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">Unallocated Students</p>
-            <p className="text-2xl font-bold text-white mt-1">{unallocatedStudents}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{unallocatedStudents}</p>
             <span className="text-[11px] text-amber-400 font-semibold">Requires Assignment</span>
           </div>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div className="p-3 rounded-xl bg-rose-950 text-rose-400 border border-rose-800/50">
-            <AlertTriangle className="w-6 h-6" />
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-3.5 sm:gap-4">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-rose-950 text-rose-400 border border-rose-800/50 shrink-0">
+            <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           <div>
             <p className="text-xs font-medium text-slate-400">High Priority Students</p>
-            <p className="text-2xl font-bold text-white mt-1">{highCount}</p>
+            <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{highCount}</p>
             <span className="text-[11px] text-rose-400 font-semibold">{moderateCount} Needs Monitoring</span>
           </div>
         </div>
       </div>
 
       {/* Analytics Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Risk Level Spread */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
+        <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800">
+          <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-4">
             Institutional Risk Distribution
           </h3>
           <div className="h-64 flex items-center justify-center">
@@ -148,7 +148,7 @@ export const AdminDashboardOverview: React.FC = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex justify-center gap-6 text-xs mt-2">
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-6 text-xs mt-2">
             <span className="flex items-center gap-1.5 text-emerald-400 font-bold">● Good ({goodCount})</span>
             <span className="flex items-center gap-1.5 text-amber-400 font-bold">● Moderate ({moderateCount})</span>
             <span className="flex items-center gap-1.5 text-rose-400 font-bold">● High Priority ({highCount})</span>
@@ -156,8 +156,8 @@ export const AdminDashboardOverview: React.FC = () => {
         </div>
 
         {/* CGPA Distribution Bar Chart */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-4">
+        <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800">
+          <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-wider mb-4">
             CGPA Grade Spread Breakdown
           </h3>
           <div className="h-64">

@@ -65,10 +65,10 @@ export const AIMemoryManager: React.FC<AIMemoryManagerProps> = ({ student }) => 
   };
 
   return (
-    <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-purple-950 text-purple-400 border border-purple-800/80">
+          <div className="p-2.5 rounded-xl bg-purple-950 text-purple-400 border border-purple-800/80 shrink-0">
             <Brain className="w-5 h-5" />
           </div>
           <div>
@@ -83,7 +83,7 @@ export const AIMemoryManager: React.FC<AIMemoryManagerProps> = ({ student }) => 
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30"
+          className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 self-start sm:self-auto shrink-0"
         >
           <Plus className="w-4 h-4" /> Add Memory Preference
         </button>

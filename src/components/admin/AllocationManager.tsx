@@ -421,8 +421,8 @@ export const AllocationManager: React.FC<AllocationManagerProps> = ({ actorId, o
         {loading ? (
           <div className="p-8 text-center text-xs text-slate-400">Loading student database...</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full text-left border-collapse text-xs min-w-[850px]">
               <thead className="bg-slate-950 text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-800">
                 <tr>
                   <th className="p-4 w-10 text-center">

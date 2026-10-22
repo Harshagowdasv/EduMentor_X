@@ -64,11 +64,11 @@ export const DataBackupExportManager: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-              <Database className="w-5 h-5 text-indigo-400" />
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <Database className="w-5 h-5 text-indigo-400 shrink-0" />
               Institutional Data Export & Backup Manager
             </h2>
             <p className="text-xs text-slate-400 mt-1">Export institutional datasets to CSV and manage offline IndexedDB backups</p>
@@ -78,7 +78,7 @@ export const DataBackupExportManager: React.FC = () => {
 
       {/* Export Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
           <h4 className="font-bold text-white text-sm">Export Student Records</h4>
           <p className="text-slate-400 text-xs">Export student academic details, CGPA, attendance, and risk standing.</p>
           <button
@@ -90,7 +90,7 @@ export const DataBackupExportManager: React.FC = () => {
           </button>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
           <h4 className="font-bold text-white text-sm">Export Faculty Mentors</h4>
           <p className="text-slate-400 text-xs">Export faculty mentor directory, active mentee counts, and status.</p>
           <button
@@ -102,7 +102,7 @@ export const DataBackupExportManager: React.FC = () => {
           </button>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
           <h4 className="font-bold text-white text-sm">Export Interventions</h4>
           <p className="text-slate-400 text-xs">Export student intervention records and outcome metrics.</p>
           <button
@@ -116,7 +116,7 @@ export const DataBackupExportManager: React.FC = () => {
       </div>
 
       {/* Demo Controls */}
-      <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div>
           <h4 className="font-bold text-white">IndexedDB Demo Storage Controls</h4>
           <p className="text-slate-400 mt-0.5">Reset demo database to fresh default institutional seed data.</p>

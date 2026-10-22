@@ -82,56 +82,62 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="EduMentorX Portal Login" subtitle="Select your institutional role and authenticate" maxWidth="xl">
       <div className="space-y-6">
         {/* Role Selection Cards */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
           {/* Student Card */}
           <button
             type="button"
             onClick={() => { setSelectedRole('student'); setEmail(''); setError(''); }}
-            className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col items-center sm:items-start text-center sm:text-left ${
+            className={`p-3 sm:p-4 rounded-2xl border text-left transition-all relative flex flex-row sm:flex-col items-center sm:items-start text-left gap-3 sm:gap-0 ${
               selectedRole === 'student'
                 ? 'bg-sky-950/70 border-sky-500 shadow-lg shadow-sky-500/20 ring-1 ring-sky-500'
                 : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
             }`}
           >
-            <div className={`p-2.5 rounded-xl mb-3 ${selectedRole === 'student' ? 'bg-sky-500/20 text-sky-400' : 'bg-slate-800 text-slate-400'}`}>
+            <div className={`p-2 sm:p-2.5 rounded-xl sm:mb-3 shrink-0 ${selectedRole === 'student' ? 'bg-sky-500/20 text-sky-400' : 'bg-slate-800 text-slate-400'}`}>
               <GraduationCap className="w-5 h-5" />
             </div>
-            <h4 className="font-bold text-sm text-white">Student</h4>
-            <p className="text-[11px] text-slate-400 mt-1 hidden sm:block">Access mentor updates & AI avatar</p>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-sm text-white">Student</h4>
+              <p className="text-[11px] text-slate-400 mt-0.5">Access mentor updates & AI avatar</p>
+            </div>
           </button>
 
           {/* Mentor Card */}
           <button
             type="button"
             onClick={() => { setSelectedRole('mentor'); setEmail(''); setError(''); }}
-            className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col items-center sm:items-start text-center sm:text-left ${
+            className={`p-3 sm:p-4 rounded-2xl border text-left transition-all relative flex flex-row sm:flex-col items-center sm:items-start text-left gap-3 sm:gap-0 ${
               selectedRole === 'mentor'
                 ? 'bg-purple-950/70 border-purple-500 shadow-lg shadow-purple-500/20 ring-1 ring-purple-500'
                 : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
             }`}
           >
-            <div className={`p-2.5 rounded-xl mb-3 ${selectedRole === 'mentor' ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-800 text-slate-400'}`}>
+            <div className={`p-2 sm:p-2.5 rounded-xl sm:mb-3 shrink-0 ${selectedRole === 'mentor' ? 'bg-purple-500/20 text-purple-400' : 'bg-slate-800 text-slate-400'}`}>
               <UserCheck className="w-5 h-5" />
             </div>
-            <h4 className="font-bold text-sm text-white">Faculty Mentor</h4>
-            <p className="text-[11px] text-slate-400 mt-1 hidden sm:block">Monitor mentees & AI safety alerts</p>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-sm text-white">Faculty Mentor</h4>
+              <p className="text-[11px] text-slate-400 mt-0.5">Monitor mentees & AI safety alerts</p>
+            </div>
           </button>
 
           {/* Admin Card */}
           <button
             type="button"
             onClick={() => { setSelectedRole('admin'); setEmail(''); setError(''); }}
-            className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col items-center sm:items-start text-center sm:text-left ${
+            className={`p-3 sm:p-4 rounded-2xl border text-left transition-all relative flex flex-row sm:flex-col items-center sm:items-start text-left gap-3 sm:gap-0 ${
               selectedRole === 'admin'
                 ? 'bg-amber-950/70 border-amber-500 shadow-lg shadow-amber-500/20 ring-1 ring-amber-500'
                 : 'bg-slate-900/80 border-slate-800 hover:border-slate-700'
             }`}
           >
-            <div className={`p-2.5 rounded-xl mb-3 ${selectedRole === 'admin' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
+            <div className={`p-2 sm:p-2.5 rounded-xl sm:mb-3 shrink-0 ${selectedRole === 'admin' ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h4 className="font-bold text-sm text-white">Administrator</h4>
-            <p className="text-[11px] text-slate-400 mt-1 hidden sm:block">Manage CSV import & allocations</p>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-bold text-sm text-white">Administrator</h4>
+              <p className="text-[11px] text-slate-400 mt-0.5">Manage CSV import & allocations</p>
+            </div>
           </button>
         </div>
 
@@ -145,7 +151,7 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => handleQuickDemoLogin(m.email, 'mentor')}
-                  className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-purple-800/60 text-slate-200 text-xs font-semibold transition-all flex items-center gap-1.5"
+                  className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-purple-800/60 text-slate-200 text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95"
                 >
                   <User className="w-3 h-3 text-purple-400" />
                   <span>{m.name}</span>
@@ -157,15 +163,15 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
 
         {/* Quick Demo Login Preset Bar */}
         {selectedRole !== 'mentor' && (
-          <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between">
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
+              <Sparkles className="w-4 h-4 text-purple-400 animate-pulse shrink-0" />
               <span className="text-xs font-semibold text-slate-300">Quick Demo Auth:</span>
             </div>
             <button
               type="button"
               onClick={() => handleQuickDemoLogin(getDefaultEmail(selectedRole), selectedRole)}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all"
+              className="w-full sm:w-auto px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all text-center active:scale-95"
             >
               Direct Login as {selectedRole.toUpperCase()}
             </button>

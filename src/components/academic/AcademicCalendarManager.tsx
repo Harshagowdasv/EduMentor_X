@@ -152,10 +152,10 @@ export const AcademicCalendarManager: React.FC<AcademicCalendarManagerProps> = (
   return (
     <div className="space-y-6 text-xs">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <Building2 className="w-5 h-5 text-indigo-400 shrink-0" />
             Institutional Academic Calendar & Semester Management
           </h2>
           <p className="text-xs text-slate-400 mt-1">
@@ -163,7 +163,7 @@ export const AcademicCalendarManager: React.FC<AcademicCalendarManagerProps> = (
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
           <button
             onClick={() => {
               setEditingYear(null);
@@ -191,11 +191,11 @@ export const AcademicCalendarManager: React.FC<AcademicCalendarManagerProps> = (
       {loading ? (
         <div className="p-8 text-center text-slate-400">Loading Academic Calendar...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           {academicYears.map((ay) => {
             const yearSemesters = semesters.filter((s) => s.academicYearId === ay.id);
             return (
-              <div key={ay.id} className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+              <div key={ay.id} className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                   <div>
                     <h3 className="font-bold text-white text-base flex items-center gap-2">

@@ -110,7 +110,7 @@ export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, us
       </div>
 
       {/* Overview Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <div className="p-4 rounded-xl bg-slate-900 border border-slate-800">
           <p className="text-xs text-slate-400">Upcoming Meetings</p>
           <p className="text-2xl font-bold text-white mt-1">{upcomingMeetings.length}</p>

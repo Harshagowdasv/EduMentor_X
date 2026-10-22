@@ -63,8 +63,8 @@ export const ForcePasswordChangeModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl shadow-indigo-950/50 space-y-6 relative overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn">
+      <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl max-w-md w-full p-4 sm:p-6 md:p-8 shadow-2xl shadow-indigo-950/50 space-y-6 relative overflow-hidden max-h-[calc(100dvh-2rem)] overflow-y-auto no-scrollbar">
         {/* Top Accent Light */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full blur-xs" />
 

@@ -44,7 +44,7 @@ export const ExecutiveInstitutionOverview: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Executive Header Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 space-y-4 shadow-xl">
+      <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-slate-800 space-y-4 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
@@ -53,13 +53,13 @@ export const ExecutiveInstitutionOverview: React.FC = () => {
             </h2>
             <p className="text-xs text-slate-300 mt-1">High-level institutional statistics, risk escalation index, and mentorship performance metrics</p>
           </div>
-          <span className="px-3 py-1 rounded-xl bg-indigo-950 text-indigo-300 border border-indigo-800 text-xs font-bold font-mono">
+          <span className="px-3 py-1 rounded-xl bg-indigo-950 text-indigo-300 border border-indigo-800 text-xs font-bold font-mono self-start sm:self-auto">
             Semester 6 Active Term
           </span>
         </div>
 
         {/* Top KPI Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 pt-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 sm:gap-3 pt-2">
           <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-center">
             <span className="text-[10px] text-slate-400 block">Total Students</span>
             <span className="font-extrabold text-white text-lg">{totalStudents}</span>
@@ -96,7 +96,7 @@ export const ExecutiveInstitutionOverview: React.FC = () => {
       </div>
 
       {/* Semester Comparison Matrix */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-emerald-400" /> Semester Performance Delta Comparison (Sem 5 vs Sem 6)
         </h3>

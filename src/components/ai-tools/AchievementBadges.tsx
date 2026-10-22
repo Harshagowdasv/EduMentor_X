@@ -37,17 +37,17 @@ export const AchievementBadges: React.FC<AchievementBadgesProps> = ({ studentId 
   ];
 
   return (
-    <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-            <Award className="w-5 h-5 text-amber-400" />
+            <Award className="w-5 h-5 text-amber-400 shrink-0" />
             Student Professional Achievements & Study Streaks
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">Verified milestone achievements and active learning consistency</p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-bold">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-950/60 border border-amber-800/60 text-amber-300 text-xs font-bold self-start sm:self-auto shrink-0">
           <Flame className="w-4 h-4 text-amber-400 animate-pulse" /> 30-Day Active Streak
         </div>
       </div>

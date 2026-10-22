@@ -103,18 +103,18 @@ export const SystemReports: React.FC = () => {
       {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Card 1: Student Performance Report */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800">
-              <BarChart2 className="w-6 h-6" />
+            <div className="p-2.5 sm:p-3 rounded-xl bg-indigo-950 text-indigo-400 border border-indigo-800 shrink-0">
+              <BarChart2 className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Student Performance & Risk Matrix Report</h3>
+              <h3 className="text-sm sm:text-base font-bold text-white">Student Performance & Risk Matrix Report</h3>
               <p className="text-xs text-slate-400">Export student CGPA, attendance, backlogs, and risk reasons</p>
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <select
               value={deptFilter}
               onChange={(e) => setDeptFilter(e.target.value)}
@@ -146,13 +146,13 @@ export const SystemReports: React.FC = () => {
         </div>
 
         {/* Card 2: Mentor Workload Report */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+        <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-purple-950 text-purple-400 border border-purple-800">
-              <Users className="w-6 h-6" />
+            <div className="p-2.5 sm:p-3 rounded-xl bg-purple-950 text-purple-400 border border-purple-800 shrink-0">
+              <Users className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Mentor Workload & Mentee Distribution</h3>
+              <h3 className="text-sm sm:text-base font-bold text-white">Mentor Workload & Mentee Distribution</h3>
               <p className="text-xs text-slate-400">Export active mentee counts, department loads, and risk ratios per mentor</p>
             </div>
           </div>

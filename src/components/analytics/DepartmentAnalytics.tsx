@@ -94,7 +94,7 @@ export const DepartmentAnalytics: React.FC = () => {
       </div>
 
       {/* Comparison Chart */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+      <div className="p-4 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
         <h3 className="text-xs font-bold text-white uppercase tracking-wider">
           Average CGPA & Attendance Comparison by Department
         </h3>
@@ -114,9 +114,9 @@ export const DepartmentAnalytics: React.FC = () => {
       </div>
 
       {/* Department Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
         {deptMetrics.map((dm, idx) => (
-          <div key={idx} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+          <div key={idx} className="p-4 sm:p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
             <h4 className="font-bold text-white text-sm border-b border-slate-800 pb-2">{dm.department}</h4>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800/80">

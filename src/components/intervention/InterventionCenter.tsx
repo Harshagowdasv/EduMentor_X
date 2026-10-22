@@ -303,13 +303,13 @@ export const InterventionCenter: React.FC<InterventionCenterProps> = ({
   return (
     <div className="space-y-6 text-xs">
       {/* Top Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-indigo-950 border border-rose-800/80 shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-rose-950 via-slate-900 to-indigo-950 border border-rose-800/80 shadow-xl">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-rose-600 text-white shadow-lg shadow-rose-600/40">
+          <div className="p-3 rounded-xl bg-rose-600 text-white shadow-lg shadow-rose-600/40 shrink-0">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight">Faculty Mentorship Intervention Center</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">Faculty Mentorship Intervention Center</h2>
             <p className="text-xs text-slate-300">
               End-to-end student risk detection, structured intervention lifecycles, and follow-up tracking
             </p>
@@ -318,7 +318,7 @@ export const InterventionCenter: React.FC<InterventionCenterProps> = ({
 
         <button
           onClick={() => setIsInitiateModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-2"
+          className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 flex items-center gap-2 self-start sm:self-auto shrink-0"
         >
           <Plus className="w-4 h-4" /> Initiate Student Intervention
         </button>
