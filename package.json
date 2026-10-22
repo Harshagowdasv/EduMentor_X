@@ -10,7 +10,9 @@
     "lint": "tsc --noEmit",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "init-admin": "node scripts/initAdminCli.js"
+    "init-admin": "node scripts/initAdminCli.js",
+    "deploy": "wrangler deploy",
+    "deploy:dry-run": "wrangler deploy --dry-run"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -36,6 +38,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5",
-    "vite": "^5.2.13"
+    "vite": "^5.2.13",
+    "wrangler": "^4.152.0"
   }
 }
