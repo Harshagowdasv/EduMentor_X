@@ -1,6 +1,7 @@
 import { IAuthService, LoginCredentials } from '../interfaces/IAuthService';
 import { User, UserRole, Mentor, Student } from '../../types';
 import { initialMentors, initialStudents } from '../seedData';
+import { logLoginStage } from '../../utils/loginPerfLogger';
 
 const STORAGE_KEY_USER = 'edumentorx_current_user';
 const STORAGE_KEY_PASSWORDS = 'edumentorx_user_passwords_map';
@@ -136,24 +137,29 @@ export class DemoAuthService implements IAuthService {
       };
     } else {
       // Student Role
-      let studentList: Student[] = [];
+      const tLookup = performance.now();
+      let matchedStudent: Student | null = null;
       try {
         const { dbService } = await import('../serviceFactory');
-        const res = await dbService.getStudents(1, 1000);
-        studentList = res.students;
+        if (cleanEmail) {
+          matchedStudent = await dbService.getStudentById(cleanEmail);
+        }
+        if (!matchedStudent) {
+          const res = await dbService.getStudents(1, 1000);
+          matchedStudent =
+            res.students.find(
+              (s) => s.email.trim().toLowerCase() === cleanEmail || s.usn.trim().toLowerCase() === cleanEmail
+            ) || null;
+        }
       } catch {
-        studentList = initialStudents;
+        // Fallback to seed data
       }
-
-      let matchedStudent = studentList.find(
-        (s) => s.email.trim().toLowerCase() === cleanEmail || s.usn.trim().toLowerCase() === cleanEmail
-      );
 
       if (!matchedStudent) {
-        matchedStudent = initialStudents.find(
-          (s) => s.email.trim().toLowerCase() === cleanEmail
-        ) || initialStudents[0];
+        matchedStudent =
+          initialStudents.find((s) => s.email.trim().toLowerCase() === cleanEmail) || initialStudents[0];
       }
+      logLoginStage('4_firestoreUserProfileFetch', performance.now() - tLookup, 'SUCCESS', 'demo-roster');
 
       const userIdKey = matchedStudent ? matchedStudent.email.toLowerCase() : cleanEmail;
       const storedCustomPassword = this.passwordsMap[userIdKey];

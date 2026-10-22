@@ -25,3 +25,33 @@ export const app = isFirebaseConfigured
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
 export const storage = app ? getStorage(app) : null;
+
+// Shared Firestore connection health & circuit-breaker state across Auth and Database services
+let sharedFirestoreOfflineUntil = 0;
+let sharedConsecutiveFailures = 0;
+let sharedLastFirestoreError: string | null = null;
+const SHARED_COOLDOWN_MS = 30000;
+const SHARED_FAILURE_THRESHOLD = 2;
+
+export function isSharedFirestoreOffline(): boolean {
+  return Date.now() < sharedFirestoreOfflineUntil;
+}
+
+export function getSharedFirestoreError(): string | null {
+  return sharedLastFirestoreError;
+}
+
+export function recordSharedFirestoreFailure(reason: string, immediateTrip = false): void {
+  sharedLastFirestoreError = reason;
+  sharedConsecutiveFailures += 1;
+  if (immediateTrip || sharedConsecutiveFailures >= SHARED_FAILURE_THRESHOLD) {
+    sharedFirestoreOfflineUntil = Date.now() + SHARED_COOLDOWN_MS;
+  }
+}
+
+export function recordSharedFirestoreSuccess(): void {
+  sharedConsecutiveFailures = 0;
+  sharedLastFirestoreError = null;
+  sharedFirestoreOfflineUntil = 0;
+}
+

@@ -145,6 +145,8 @@ export class DemoDatabaseService implements IDatabaseService {
 
   async getMentorById(id: string): Promise<Mentor | null> {
     await this.initPromise;
+    const direct = await idbService.getById<Mentor>(STORES.MENTORS, id);
+    if (direct) return direct;
     const mentors = await this.getMentors();
     return mentors.find((m) => m.id === id || m.userId === id) || null;
   }
@@ -278,24 +280,48 @@ export class DemoDatabaseService implements IDatabaseService {
 
   async getStudentById(id: string): Promise<Student | null> {
     await this.initPromise;
+    const direct = await idbService.getById<Student>(STORES.STUDENTS, id);
+    if (direct) return direct;
     const students = await idbService.getAll<Student>(STORES.STUDENTS);
-    return students.find((s) => s.id === id || s.userId === id || s.usn === id) || null;
+    const lowerId = id.toLowerCase();
+    return (
+      students.find(
+        (s) =>
+          s.id === id ||
+          s.userId === id ||
+          s.usn === id ||
+          (s.email && s.email.toLowerCase() === lowerId)
+      ) || null
+    );
   }
 
   async getStudentsByMentorId(mentorId: string): Promise<Student[]> {
     await this.initPromise;
-    const mentors = await this.getMentors();
+    const [mentors, students] = await Promise.all([
+      this.getMentors(),
+      idbService.getAll<Student>(STORES.STUDENTS),
+    ]);
     const targetMentor = mentors.find(
       (m) => m.id === mentorId || m.userId === mentorId || m.email.toLowerCase() === mentorId.toLowerCase()
     );
     const canonicalMentorId = targetMentor ? targetMentor.id : mentorId;
-    const students = await idbService.getAll<Student>(STORES.STUDENTS);
-    return students.filter((s) => s.mentorId === canonicalMentorId || (targetMentor && (s.mentorId === targetMentor.userId || s.mentorEmail === targetMentor.email)));
+    return students.filter(
+      (s) =>
+        s.mentorId === canonicalMentorId ||
+        (targetMentor && (s.mentorId === targetMentor.userId || s.mentorEmail === targetMentor.email))
+    );
   }
 
   async putStudent(student: Student): Promise<void> {
     await this.initPromise;
     await idbService.put(STORES.STUDENTS, student);
+    await this.recalculateMentorMenteeCounts();
+  }
+
+  async putStudentsBatch(students: Student[]): Promise<void> {
+    if (students.length === 0) return;
+    await this.initPromise;
+    await idbService.putAll(STORES.STUDENTS, students);
     await this.recalculateMentorMenteeCounts();
   }
 
@@ -672,18 +698,24 @@ export class DemoDatabaseService implements IDatabaseService {
     options?: { reassignAll?: boolean; reason?: string }
   ): Promise<{ allocatedCount: number; skippedCount: number; failedCount: number }> {
     await this.initPromise;
-    const mentors = await this.getMentors();
+    const [mentors, students] = await Promise.all([
+      this.getMentors(),
+      idbService.getAll<Student>(STORES.STUDENTS),
+    ]);
     const targetMentor = mentors.find((m) => m.id === newMentorId);
     if (!targetMentor) throw new Error('Target mentor not found');
 
-    const students = await idbService.getAll<Student>(STORES.STUDENTS);
-    const targetStudents = students.filter((s) => studentIds.includes(s.id));
+    const studentIdSet = new Set(studentIds);
+    const targetStudents = students.filter((s) => studentIdSet.has(s.id));
 
     let allocatedCount = 0;
     let skippedCount = 0;
-    let failedCount = 0;
+    const failedCount = 0;
 
     const previousMentorIds: string[] = [];
+    const studentsToUpdate: Student[] = [];
+    const historyToWrite: AllocationHistory[] = [];
+    const nowIso = new Date().toISOString();
 
     for (const student of targetStudents) {
       if (student.mentorId === newMentorId) {
@@ -699,9 +731,9 @@ export class DemoDatabaseService implements IDatabaseService {
       student.mentorName = targetMentor.name;
       student.mentorEmail = targetMentor.email;
 
-      await idbService.put(STORES.STUDENTS, student);
+      studentsToUpdate.push(student);
 
-      const newHistoryRecord: AllocationHistory = {
+      historyToWrite.push({
         id: `alloc_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         studentId: student.id,
         studentUsn: student.usn,
@@ -711,20 +743,25 @@ export class DemoDatabaseService implements IDatabaseService {
         newMentorId: targetMentor.id,
         newMentorName: targetMentor.name,
         changedBy,
-        timestamp: new Date().toISOString(),
+        timestamp: nowIso,
         reason: options?.reason || 'Batch Administrative Mentor Mapping',
-      };
-      await idbService.put(STORES.ALLOCATION_HISTORY, newHistoryRecord);
+      });
       allocatedCount++;
     }
 
-    await this.recalculateMentorMenteeCounts();
+    if (studentsToUpdate.length > 0) {
+      await Promise.all([
+        idbService.putAll(STORES.STUDENTS, studentsToUpdate),
+        idbService.putAll(STORES.ALLOCATION_HISTORY, historyToWrite),
+      ]);
+      await this.recalculateMentorMenteeCounts();
+    }
 
     await this.logAuditEvent({
       actorId: changedBy,
       actorName: 'Admin User',
       actorRole: 'admin',
-      action: previousMentorIds.length > 0 ? 'REASSIGN_STUDENT' : 'ALLOCATE_STUDENT' as any,
+      action: previousMentorIds.length > 0 ? 'REASSIGN_STUDENT' : ('ALLOCATE_STUDENT' as any),
       targetType: 'Allocation',
       targetId: targetMentor.id,
       newValue: { allocatedCount, skippedCount, targetMentorId: targetMentor.id, targetMentorName: targetMentor.name },
@@ -1470,12 +1507,16 @@ export class DemoDatabaseService implements IDatabaseService {
   async setActiveSemester(semesterId: string): Promise<void> {
     await this.initPromise;
     const sems = await idbService.getAll<Semester>(STORES.SEMESTERS);
+    const changedSems: Semester[] = [];
     for (const s of sems) {
       const isTarget = s.id === semesterId;
       if (s.isActive !== isTarget) {
         s.isActive = isTarget;
-        await idbService.put(STORES.SEMESTERS, s);
+        changedSems.push(s);
       }
+    }
+    if (changedSems.length > 0) {
+      await idbService.putAll(STORES.SEMESTERS, changedSems);
     }
   }
 
@@ -1495,14 +1536,16 @@ export class DemoDatabaseService implements IDatabaseService {
     actorId: string
   ): Promise<IAMarksImportResult> {
     await this.initPromise;
-    const existingStudents = await idbService.getAll<Student>(STORES.STUDENTS);
+    const [existingStudents, existingMarks] = await Promise.all([
+      idbService.getAll<Student>(STORES.STUDENTS),
+      idbService.getAll<StudentAcademicMark>(STORES.STUDENT_ACADEMIC_MARKS),
+    ]);
     const existingStudentsMap = new Map<string, Student>();
     existingStudents.forEach((s) => {
       existingStudentsMap.set(s.usn.trim().toUpperCase(), s);
       existingStudentsMap.set(s.id, s);
     });
 
-    const existingMarks = await idbService.getAll<StudentAcademicMark>(STORES.STUDENT_ACADEMIC_MARKS);
     const existingMarksMap = new Map<string, StudentAcademicMark>();
     existingMarks.forEach((m) => {
       const key = `${m.studentUsn.trim().toUpperCase()}_${m.academicYear.trim()}_${m.semester.trim()}_${m.subjectCode.trim().toUpperCase()}`;
@@ -1511,10 +1554,11 @@ export class DemoDatabaseService implements IDatabaseService {
 
     let importedCount = 0;
     let updatedCount = 0;
-    let skippedCount = 0;
+    const skippedCount = 0;
     let failedCount = 0;
     const errors: IAMarksImportResult['errors'] = [];
     const details: IAMarksImportResult['details'] = [];
+    const marksToPersist: StudentAcademicMark[] = [];
 
     const nowStr = new Date().toISOString();
 
@@ -1583,7 +1627,7 @@ export class DemoDatabaseService implements IDatabaseService {
           updatedAt: nowStr,
           updatedBy: actorId,
         };
-        await idbService.put(STORES.STUDENT_ACADEMIC_MARKS, updatedMark);
+        marksToPersist.push(updatedMark);
         existingMarksMap.set(compositeKey, updatedMark);
         updatedCount++;
         details.push({ rowNumber, usn, name: targetStudent.name, subjectCode, status: 'UPDATE' });
@@ -1604,11 +1648,15 @@ export class DemoDatabaseService implements IDatabaseService {
           updatedAt: nowStr,
           updatedBy: actorId,
         };
-        await idbService.put(STORES.STUDENT_ACADEMIC_MARKS, newMark);
+        marksToPersist.push(newMark);
         existingMarksMap.set(compositeKey, newMark);
         importedCount++;
         details.push({ rowNumber, usn, name: targetStudent.name, subjectCode, status: 'NEW' });
       }
+    }
+
+    if (marksToPersist.length > 0) {
+      await idbService.putAll(STORES.STUDENT_ACADEMIC_MARKS, marksToPersist);
     }
 
     await this.logAuditEvent({
@@ -1634,10 +1682,21 @@ export class DemoDatabaseService implements IDatabaseService {
 
   async getStudentAcademicMarks(studentId: string): Promise<StudentAcademicMark[]> {
     await this.initPromise;
-    const allMarks = await idbService.getAll<StudentAcademicMark>(STORES.STUDENT_ACADEMIC_MARKS);
-    const student = await idbService.getById<Student>(STORES.STUDENTS, studentId);
+    if (studentId === 'all') {
+      return idbService.getAll<StudentAcademicMark>(STORES.STUDENT_ACADEMIC_MARKS);
+    }
+    const [allMarks, student] = await Promise.all([
+      idbService.getAll<StudentAcademicMark>(STORES.STUDENT_ACADEMIC_MARKS),
+      this.getStudentById(studentId),
+    ]);
     const usnUpper = student ? student.usn.trim().toUpperCase() : studentId.trim().toUpperCase();
-    return allMarks.filter((m) => m.studentId === studentId || m.studentUsn.trim().toUpperCase() === usnUpper);
+    const canonicalStudentId = student ? student.id : studentId;
+    return allMarks.filter(
+      (m) =>
+        m.studentId === canonicalStudentId ||
+        m.studentId === studentId ||
+        m.studentUsn.trim().toUpperCase() === usnUpper
+    );
   }
 
   async editStudent(id: string, updates: Partial<Student>, actorId: string): Promise<Student> {
@@ -1879,12 +1938,29 @@ export class DemoDatabaseService implements IDatabaseService {
   }
 
   private async recalculateMentorMenteeCounts() {
-    const mentors = await idbService.getAll<Mentor>(STORES.MENTORS);
-    const students = await idbService.getAll<Student>(STORES.STUDENTS);
+    const [mentors, students] = await Promise.all([
+      idbService.getAll<Mentor>(STORES.MENTORS),
+      idbService.getAll<Student>(STORES.STUDENTS),
+    ]);
 
+    const countMap = new Map<string, number>();
+    for (const s of students) {
+      if (s.mentorId) {
+        countMap.set(s.mentorId, (countMap.get(s.mentorId) || 0) + 1);
+      }
+    }
+
+    const changedMentors: Mentor[] = [];
     for (const m of mentors) {
-      m.activeMenteesCount = students.filter((s) => s.mentorId === m.id).length;
-      await idbService.put(STORES.MENTORS, m);
+      const nextCount = countMap.get(m.id) || 0;
+      if (m.activeMenteesCount !== nextCount) {
+        m.activeMenteesCount = nextCount;
+        changedMentors.push(m);
+      }
+    }
+
+    if (changedMentors.length > 0) {
+      await idbService.putAll(STORES.MENTORS, changedMentors);
     }
   }
 }

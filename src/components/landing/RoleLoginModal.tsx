@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { UserRole } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { clearLoginStageMetrics } from '../../utils/loginPerfLogger';
 import { ShieldCheck, UserCheck, GraduationCap, ArrowRight, Lock, Mail, Sparkles, User } from 'lucide-react';
 
 interface RoleLoginModalProps {
@@ -34,6 +35,7 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
     e.preventDefault();
     setError('');
     setLoading(true);
+    clearLoginStageMetrics();
 
     try {
       await login({
@@ -54,6 +56,7 @@ export const RoleLoginModal: React.FC<RoleLoginModalProps> = ({
     setLoading(true);
     setSelectedRole(role);
     setEmail(targetEmail);
+    clearLoginStageMetrics();
 
     try {
       await login({

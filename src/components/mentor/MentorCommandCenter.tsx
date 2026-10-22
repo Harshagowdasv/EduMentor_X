@@ -7,6 +7,7 @@ import {
   AppNotification
 } from '../../types';
 import { dbService } from '../../services/serviceFactory';
+import { logLoginStage } from '../../utils/loginPerfLogger';
 import { calculateExplainableRisk } from '../../utils/riskCalculator';
 import { MentorActionCenter } from './MentorActionCenter';
 import {
@@ -58,6 +59,7 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
   }, [mentorId]);
 
   const loadCommandCenterData = async () => {
+    const tStart = performance.now();
     setLoading(true);
     try {
       // Perform single-pass concurrent fetch across independent mentor-scoped datasets
@@ -84,7 +86,9 @@ export const MentorCommandCenter: React.FC<MentorCommandCenterProps> = ({
       setTasks(tList);
       setMeetings(mList);
       setNotifications(nList);
+      logLoginStage('7_dashboardFirstRenderAndQueries', performance.now() - tStart, 'SUCCESS', 'mentor-command-center');
     } catch (err) {
+      logLoginStage('7_dashboardFirstRenderAndQueries', performance.now() - tStart, 'FAILURE', 'mentor-command-center');
       console.error('Failed to load Mentor Command Center data:', err);
     } finally {
       setLoading(false);

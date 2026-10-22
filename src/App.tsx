@@ -64,6 +64,7 @@ import { FollowUpTaskManager } from './components/workflow/FollowUpTaskManager';
 import { CentralResourceLibrary } from './components/resources/CentralResourceLibrary';
 
 import { dbService } from './services/serviceFactory';
+import { logLoginStage } from './utils/loginPerfLogger';
 
 const MainApp: React.FC = () => {
   const { user, logout } = useAuth();
@@ -84,46 +85,87 @@ const MainApp: React.FC = () => {
   const [studentProfile, setStudentProfile] = useState<Student | null>(null);
 
   React.useEffect(() => {
-    if (user && user.role === 'student') {
-      dbService.getStudentById(user.id).then((s) => {
-        if (s) {
-          setStudentProfile(s);
-        } else {
-          dbService.getStudents(1, 1000).then((res) => {
-            const matchByEmail = res.students.find(x => x.email.toLowerCase() === user.email.toLowerCase());
-            if (matchByEmail) {
-              setStudentProfile(matchByEmail);
-            } else {
-              setStudentProfile({
-                id: user.id,
-                userId: user.id,
-                usn: user.id,
-                name: user.name || 'Student',
-                email: user.email,
-                phone: user.phone || '',
-                parentPhone: user.phone || '',
-                mentorId: null,
-                department: user.department || 'Computer Science & Engineering',
-                program: 'B.Tech',
-                year: '3rd Year',
-                semester: 'Semester 6',
-                section: 'A',
-                admissionYear: '2023',
-                cgpa: 8.0,
-                attendance: 85,
-                financialScore: 5,
-                studyHours: 15,
-                previousYearBacklogs: 0,
-                currentBacklogs: 0,
-                academicStatus: 'Active',
-                riskLevel: 'GOOD_PERFORMANCE',
-                riskReasons: [],
-                createdAt: new Date().toISOString(),
-              });
-            }
+    if (!user) {
+      setStudentProfile(null);
+      return;
+    }
+
+    const tNav = performance.now();
+    logLoginStage('6_navigateToDashboard', performance.now() - tNav, 'SUCCESS', `role=${user.role}`);
+
+    if (user.role === 'student') {
+      let isMounted = true;
+      const resolveStudent = async () => {
+        try {
+          const direct =
+            (await dbService.getStudentById(user.id)) ||
+            (user.email ? await dbService.getStudentById(user.email) : null);
+
+          if (!isMounted) return;
+          if (direct) {
+            setStudentProfile(direct);
+          } else {
+            setStudentProfile({
+              id: user.id,
+              userId: user.id,
+              usn: user.id,
+              name: user.name || 'Student',
+              email: user.email,
+              phone: user.phone || '',
+              parentPhone: user.phone || '',
+              mentorId: null,
+              department: user.department || 'Computer Science & Engineering',
+              program: 'B.Tech',
+              year: '3rd Year',
+              semester: 'Semester 6',
+              section: 'A',
+              admissionYear: '2023',
+              cgpa: 8.0,
+              attendance: 85,
+              financialScore: 5,
+              studyHours: 15,
+              previousYearBacklogs: 0,
+              currentBacklogs: 0,
+              academicStatus: 'Active',
+              riskLevel: 'GOOD_PERFORMANCE',
+              riskReasons: [],
+              createdAt: new Date().toISOString(),
+            });
+          }
+        } catch {
+          if (!isMounted) return;
+          setStudentProfile({
+            id: user.id,
+            userId: user.id,
+            usn: user.id,
+            name: user.name || 'Student',
+            email: user.email,
+            phone: user.phone || '',
+            parentPhone: user.phone || '',
+            mentorId: null,
+            department: user.department || 'Computer Science & Engineering',
+            program: 'B.Tech',
+            year: '3rd Year',
+            semester: 'Semester 6',
+            section: 'A',
+            admissionYear: '2023',
+            cgpa: 8.0,
+            attendance: 85,
+            financialScore: 5,
+            studyHours: 15,
+            previousYearBacklogs: 0,
+            currentBacklogs: 0,
+            academicStatus: 'Active',
+            riskLevel: 'GOOD_PERFORMANCE',
+            riskReasons: [],
+            createdAt: new Date().toISOString(),
           });
         }
-      });
+      };
+      resolveStudent();
+      return () => {
+        isMounted = false;
+      };
     }
   }, [user]);
 

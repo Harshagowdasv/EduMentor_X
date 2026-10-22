@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Student, StudentAcademicMark } from '../../types';
 import { dbService } from '../../services/serviceFactory';
+import { logLoginStage } from '../../utils/loginPerfLogger';
 import {
   TrendingUp,
   GraduationCap,
@@ -35,12 +36,15 @@ export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> =
   }, [student?.id]);
 
   const loadStudentMarks = async () => {
+    const tStart = performance.now();
     setLoadingMarks(true);
     setMarksError(null);
     try {
       const marks = await dbService.getStudentAcademicMarks(student.id);
       setIaMarks(marks);
+      logLoginStage('7_dashboardFirstRenderAndQueries', performance.now() - tStart, 'SUCCESS', 'student-dashboard');
     } catch (err: any) {
+      logLoginStage('7_dashboardFirstRenderAndQueries', performance.now() - tStart, 'FAILURE', 'student-dashboard');
       console.error('Failed to load student IA marks:', err);
       setMarksError(err.message || 'Failed to load IA marks');
     } finally {

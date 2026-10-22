@@ -17,19 +17,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const updateUserDeduped = React.useCallback((nextUser: User | null) => {
+    setUser((prev) => {
+      if (!prev && !nextUser) return null;
+      if (
+        prev &&
+        nextUser &&
+        prev.id === nextUser.id &&
+        prev.role === nextUser.role &&
+        prev.mustChangePassword === nextUser.mustChangePassword &&
+        prev.name === nextUser.name &&
+        prev.email === nextUser.email
+      ) {
+        return prev;
+      }
+      return nextUser;
+    });
+  }, []);
+
   useEffect(() => {
     const unsubscribe = authService.onAuthStateChanged((currUser) => {
-      setUser(currUser);
+      updateUserDeduped(currUser);
       setLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [updateUserDeduped]);
 
   const login = async (credentials: LoginCredentials) => {
     setLoading(true);
     try {
       const loggedUser = await authService.login(credentials);
-      setUser(loggedUser);
+      updateUserDeduped(loggedUser);
       setLoading(false);
       return loggedUser;
     } catch (err) {

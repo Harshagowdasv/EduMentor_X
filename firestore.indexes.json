@@ -243,6 +243,70 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "interventions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "mentorAllocations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "studentAcademicMarks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "academicYear",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "semester",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "studentAcademicMarks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "studentUsn",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "academicYear",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "semester",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

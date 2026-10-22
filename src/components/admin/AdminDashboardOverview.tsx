@@ -12,6 +12,7 @@ import {
   Cell
 } from 'recharts';
 import { dbService } from '../../services/serviceFactory';
+import { logLoginStage } from '../../utils/loginPerfLogger';
 import { Student, Mentor } from '../../types';
 import { Users, UserCheck, UserX, Building2, AlertTriangle, TrendingUp, ShieldAlert, Award } from 'lucide-react';
 
@@ -25,6 +26,7 @@ export const AdminDashboardOverview: React.FC = () => {
   }, []);
 
   const loadData = async () => {
+    const tStart = performance.now();
     setLoading(true);
     try {
       const [stRes, mList] = await Promise.all([
@@ -33,7 +35,9 @@ export const AdminDashboardOverview: React.FC = () => {
       ]);
       setStudents(stRes.students);
       setMentors(mList);
+      logLoginStage('7_dashboardFirstRenderAndQueries', performance.now() - tStart, 'SUCCESS', 'admin-overview');
     } catch (err) {
+      logLoginStage('7_dashboardFirstRenderAndQueries', performance.now() - tStart, 'FAILURE', 'admin-overview');
       console.error('Failed to load admin overview data:', err);
     } finally {
       setLoading(false);

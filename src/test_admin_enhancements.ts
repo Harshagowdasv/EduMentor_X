@@ -269,9 +269,93 @@ async function runAdminEnhancementsTestSuite() {
   }
   console.log('PASSED: Admin Delete/Deactivate Student & Compliance Preservation verified.\n');
 
+  // ----------------------------------------------------
+  // TEST 6: FIREBASE DATABASE SERVICE CACHE, INVALIDATION & OUTAGE SAFETY
+  // ----------------------------------------------------
+  console.log('--- TEST 6: FIREBASE DATABASE SERVICE CACHE, INVALIDATION & OUTAGE SAFETY ---');
+  const perfMetricsInit = firebaseDb.getPerformanceMetrics();
+  if (perfMetricsInit.readTimeoutMs < 2000 || perfMetricsInit.writeTimeoutMs < 2500) {
+    throw new Error(`FAILED: Unsafe Firestore timeout configuration (${perfMetricsInit.readTimeoutMs}ms / ${perfMetricsInit.writeTimeoutMs}ms)`);
+  }
+
+  // Verify real student records, IA marks, and allocations via FirebaseDatabaseService
+  const fbStudentUSN = `FB-VERIFY-${Date.now()}`;
+  const fbStudent = await firebaseDb.createStudent({
+    usn: fbStudentUSN,
+    userId: `u_${fbStudentUSN}`,
+    mentorId: null,
+    name: 'Firebase Path Student',
+    email: `fb_student_${Date.now()}@edumentorx.edu`,
+    phone: '9888877779',
+    parentPhone: '9888877780',
+    department: 'Computer Science & Engineering',
+    program: 'B.Tech',
+    year: '3rd Year',
+    semester: 'Semester 6',
+    section: 'A',
+    admissionYear: '2023',
+    cgpa: 8.4,
+    attendance: 88,
+    financialScore: 6,
+    studyHours: 16,
+    previousYearBacklogs: 0,
+    currentBacklogs: 0,
+    academicStatus: 'Active',
+  }, actorId);
+
+  // Warm cache then edit student and verify immediate cache invalidation
+  await firebaseDb.getStudentById(fbStudent.id);
+  await firebaseDb.editStudent(fbStudent.id, { name: 'Firebase Path Student Updated', cgpa: 9.1 }, actorId);
+  const fbFetchedAfterEdit = await firebaseDb.getStudentById(fbStudent.id);
+  if (!fbFetchedAfterEdit || fbFetchedAfterEdit.name !== 'Firebase Path Student Updated' || fbFetchedAfterEdit.cgpa !== 9.1) {
+    throw new Error('FAILED: FirebaseDatabaseService cache invalidation failed after editStudent');
+  }
+
+  // Import IA marks via FirebaseDatabaseService and verify retrieval + invalidation
+  await firebaseDb.getStudentAcademicMarks(fbStudent.id); // warm empty cache
+  await firebaseDb.importIAMarksCSV([
+    {
+      USN: fbStudentUSN,
+      'Student Name': 'Firebase Path Student Updated',
+      'Academic Year': '2026-2027',
+      Semester: 'Semester 6',
+      'Subject Code': 'CS603',
+      'Subject Name': 'Distributed Systems',
+      'IA1 Marks': '47',
+      'IA2 Marks': '49',
+    },
+  ], '2026-2027', 'Semester 6', actorId);
+  const fbMarksAfterImport = await firebaseDb.getStudentAcademicMarks(fbStudent.id);
+  if (fbMarksAfterImport.length !== 1 || fbMarksAfterImport[0].ia1Marks !== 47) {
+    throw new Error('FAILED: FirebaseDatabaseService cache invalidation failed after importIAMarksCSV');
+  }
+
+  // Verify allocation & invalidation via FirebaseDatabaseService
+  await firebaseDb.getStudentsByMentorId(mentorA.id); // warm mentor cache
+  await firebaseDb.allocateStudent(fbStudent.id, mentorA.id, actorId, 'FB path allocation');
+  const fbMentorMentees = await firebaseDb.getStudentsByMentorId(mentorA.id);
+  if (!fbMentorMentees.some((s) => s.id === fbStudent.id)) {
+    throw new Error('FAILED: FirebaseDatabaseService cache invalidation failed after allocateStudent');
+  }
+
+  // Verify temporary Firestore outage raises clear retryable error when requireFirestore is true
+  let outageErrorCaught = false;
+  try {
+    await firebaseDb.getStudents(1, 50, undefined, { skipCache: true, requireFirestore: true });
+  } catch (outageErr: any) {
+    if (String(outageErr.message).includes('Database temporarily unavailable')) {
+      outageErrorCaught = true;
+    }
+  }
+  if (!outageErrorCaught && firebaseDb.getPerformanceMetrics().lastFirestoreError) {
+    throw new Error('FAILED: Outage did not surface clear retryable error when requireFirestore=true');
+  }
+  console.log('PASSED: FirebaseDatabaseService production path, timeouts, cache invalidation & outage signaling verified.\n');
+
   console.log('====================================================');
   console.log(' ALL ADMIN ENHANCEMENTS TESTS PASSED 100%');
   console.log('====================================================');
+  process.exit(0);
 }
 
 runAdminEnhancementsTestSuite().catch((err) => {
