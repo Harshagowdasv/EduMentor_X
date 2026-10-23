@@ -392,7 +392,35 @@ export class FirebaseAuthService implements IAuthService {
       }
     }
 
-    const canonicalId = (finalRole === 'mentor' && mentorId) ? mentorId : fbUser.uid;
+    let studentId: string | undefined =
+      tokenResult?.claims?.studentId ||
+      userDocRes.data?.studentId ||
+      userDocRes.data?.usn;
+
+    if (finalRole === 'student') {
+      try {
+        const { dbService } = await import('../serviceFactory');
+        const stRecord =
+          (studentId ? await dbService.getStudentById(studentId) : null) ||
+          (await dbService.getStudentById(fbUser.uid)) ||
+          (emailLower ? await dbService.getStudentById(emailLower) : null);
+        if (stRecord) {
+          studentId = studentId || stRecord.id || stRecord.usn;
+          if (!name || name === 'User' || name === fbUser.email?.split('@')[0]) name = stRecord.name;
+          if (!department || department === 'Institutional Administration') department = stRecord.department;
+          if (!phone) phone = stRecord.phone;
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    const canonicalId =
+      finalRole === 'mentor' && mentorId
+        ? mentorId
+        : finalRole === 'student' && studentId
+        ? studentId
+        : fbUser.uid;
 
     return {
       id: canonicalId,
@@ -404,6 +432,8 @@ export class FirebaseAuthService implements IAuthService {
       phone,
       mustChangePassword,
       mentorId: mentorId || (finalRole === 'mentor' ? canonicalId : undefined),
+      studentId: studentId || (finalRole === 'student' ? canonicalId : undefined),
+      usn: studentId || (finalRole === 'student' ? canonicalId : undefined),
     };
   }
 }

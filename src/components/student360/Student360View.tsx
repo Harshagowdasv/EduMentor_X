@@ -134,16 +134,14 @@ export const Student360View: React.FC<Student360ViewProps> = ({
                 <User className="w-4 h-4" /> Institutional Biodata
               </button>
 
-              {userRole !== 'student' && (
-                <button
-                  onClick={() => setActiveTab('interventions')}
-                  className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
-                    activeTab === 'interventions' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <ShieldAlert className="w-4 h-4" /> Interventions ({interventions.length})
-                </button>
-              )}
+              <button
+                onClick={() => setActiveTab('interventions')}
+                className={`px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shrink-0 whitespace-nowrap ${
+                  activeTab === 'interventions' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ShieldAlert className="w-4 h-4" /> Interventions ({interventions.length})
+              </button>
 
               <button
                 onClick={() => setActiveTab('ia-marks')}
@@ -277,7 +275,7 @@ export const Student360View: React.FC<Student360ViewProps> = ({
             )}
 
             {/* TAB: INTERVENTIONS */}
-            {activeTab === 'interventions' && userRole !== 'student' && (
+            {activeTab === 'interventions' && (
               <div className="space-y-4">
                 {interventions.length === 0 ? (
                   <p className="p-6 text-center text-xs text-slate-400 bg-slate-950 border border-slate-800 rounded-xl">

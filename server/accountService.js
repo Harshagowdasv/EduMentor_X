@@ -560,6 +560,7 @@ export async function importStudentsBatch({ csvRows, actorId, duplicateStrategy 
           await adminAuth.setCustomUserClaims(userRecord.uid, {
             role: 'student',
             student: true,
+            studentId: item.usn,
           });
 
           const studentProfile = {
@@ -612,6 +613,8 @@ export async function importStudentsBatch({ csvRows, actorId, duplicateStrategy 
         batch.set(userRef, {
           uid: resItem.uid,
           id: resItem.uid,
+          studentId: resItem.item.usn,
+          usn: resItem.item.usn,
           name: resItem.item.name,
           email: resItem.item.email,
           phone: resItem.item.phone,

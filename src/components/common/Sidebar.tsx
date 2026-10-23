@@ -96,6 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       { id: 'goals', label: 'Goals & Achievements', icon: Target },
       { id: 'academic-calendar', label: 'Academic Calendar', icon: Calendar },
       { id: 'meetings', label: 'Scheduled Meetings', icon: Calendar },
+      { id: 'interventions', label: 'Mentorship Interventions', icon: ShieldAlert },
       { id: 'tasks', label: 'Assigned Tasks', icon: CheckSquare },
       { id: 'resources', label: 'Study Resources', icon: FileDown },
       { id: 'portfolio', label: 'Career Portfolio', icon: Award },

@@ -46,6 +46,7 @@ import { MentorActionCenter } from './components/mentor/MentorActionCenter';
 
 // Student Views (Phases 1, 2 & 3)
 import { StudentDashboardOverview } from './components/student/StudentDashboardOverview';
+import { StudentInterventionsView } from './components/student/StudentInterventionsView';
 import { CareerPortfolioBuilder } from './components/student/CareerPortfolioBuilder';
 import { AIMentorSection } from './components/student/AIMentorSection';
 import { StudentGoalTracker } from './components/ai-tools/StudentGoalTracker';
@@ -98,8 +99,11 @@ const MainApp: React.FC = () => {
       let isMounted = true;
       const resolveStudent = async () => {
         try {
+          const searchKey = user.studentId || user.usn || user.id;
           const direct =
+            (await dbService.getStudentById(searchKey)) ||
             (await dbService.getStudentById(user.id)) ||
+            (user.userId ? await dbService.getStudentById(user.userId) : null) ||
             (user.email ? await dbService.getStudentById(user.email) : null);
 
           if (!isMounted) return;
@@ -358,6 +362,7 @@ const MainApp: React.FC = () => {
                 <StudentDashboardOverview
                   student={studentProfile}
                   onOpenAIMentor={() => setActiveSection('ai-mentor')}
+                  onNavigate={(sec) => setActiveSection(sec)}
                 />
               )}
               {activeSection === 'ai-mentor' && <AIMentorSection student={studentProfile} />}
@@ -373,16 +378,22 @@ const MainApp: React.FC = () => {
                 </div>
               )}
               {activeSection === 'academic-calendar' && (
-                <AcademicCalendarManager userRole={user.role} userId={user.id} department={studentProfile.department} />
+                <AcademicCalendarManager userRole={user.role} userId={studentProfile.id} department={studentProfile.department} />
               )}
               {activeSection === 'meetings' && (
-                <MeetingScheduler userRole={user.role} userId={user.id} userName={user.name} />
+                <MeetingScheduler userRole={user.role} userId={studentProfile.id} userName={user.name} />
+              )}
+              {activeSection === 'interventions' && (
+                <StudentInterventionsView
+                  student={studentProfile}
+                  onOpenMeetings={() => setActiveSection('meetings')}
+                />
               )}
               {activeSection === 'tasks' && (
-                <FollowUpTaskManager userRole={user.role} userId={user.id} userName={user.name} />
+                <FollowUpTaskManager userRole={user.role} userId={studentProfile.id} userName={user.name} />
               )}
               {activeSection === 'resources' && (
-                <CentralResourceLibrary userRole={user.role} userId={user.id} userName={user.name} department={studentProfile.department} />
+                <CentralResourceLibrary userRole={user.role} userId={studentProfile.id} userName={user.name} department={studentProfile.department} />
               )}
               {activeSection === 'portfolio' && <CareerPortfolioBuilder studentId={studentProfile.id} />}
               {activeSection === 'timeline' && <StudentProgressTimeline studentId={studentProfile.id} />}

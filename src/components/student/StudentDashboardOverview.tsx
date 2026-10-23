@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Student, StudentAcademicMark } from '../../types';
+import { Student, StudentAcademicMark, Meeting, InterventionRecord } from '../../types';
 import { dbService } from '../../services/serviceFactory';
 import { logLoginStage } from '../../utils/loginPerfLogger';
 import {
@@ -11,29 +11,42 @@ import {
   FileSpreadsheet,
   TrendingDown,
   Minus,
-  BookOpen,
-  Loader2
+  Loader2,
+  Calendar,
+  ShieldAlert,
+  ArrowRight,
+  CheckCircle2,
+  Target,
+  Sparkles
 } from 'lucide-react';
 
 interface StudentDashboardOverviewProps {
   student: Student;
   onOpenAIMentor: () => void;
+  onNavigate?: (section: string) => void;
 }
 
 export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> = ({
   student,
   onOpenAIMentor,
+  onNavigate,
 }) => {
   const [iaMarks, setIaMarks] = useState<StudentAcademicMark[]>([]);
   const [loadingMarks, setLoadingMarks] = useState(true);
   const [marksError, setMarksError] = useState<string | null>(null);
   const [selectedTermFilter, setSelectedTermFilter] = useState<string>('active');
 
+  // Mentorship Schedule & Interventions
+  const [upcomingMeetings, setUpcomingMeetings] = useState<Meeting[]>([]);
+  const [activeInterventions, setActiveInterventions] = useState<InterventionRecord[]>([]);
+  const [loadingWorkflow, setLoadingWorkflow] = useState(true);
+
   useEffect(() => {
     if (student && student.id) {
       loadStudentMarks();
+      loadStudentWorkflow();
     }
-  }, [student?.id]);
+  }, [student?.id, student?.usn, student?.userId]);
 
   const loadStudentMarks = async () => {
     const tStart = performance.now();
@@ -49,6 +62,23 @@ export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> =
       setMarksError(err.message || 'Failed to load IA marks');
     } finally {
       setLoadingMarks(false);
+    }
+  };
+
+  const loadStudentWorkflow = async () => {
+    setLoadingWorkflow(true);
+    try {
+      const candidateKey = student.id || student.usn || student.userId;
+      const [mList, iList] = await Promise.all([
+        dbService.getMeetings({ studentId: candidateKey }),
+        dbService.getInterventions({ studentId: candidateKey }),
+      ]);
+      setUpcomingMeetings(mList.filter((m) => m.status === 'upcoming'));
+      setActiveInterventions(iList.filter((i) => i.status !== 'RESOLVED' && i.status !== 'CLOSED'));
+    } catch (err) {
+      console.warn('Failed to load student schedule and interventions:', err);
+    } finally {
+      setLoadingWorkflow(false);
     }
   };
 
@@ -111,6 +141,151 @@ export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> =
             <p className="text-xl sm:text-2xl font-bold text-white mt-0.5 sm:mt-1">{student.previousYearBacklogs}</p>
             <span className="text-[11px] text-slate-400">Previous semesters</span>
           </div>
+        </div>
+      </div>
+
+      {/* SCHEDULE & INTERVENTIONS SPOTLIGHT PANELS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* PANEL 1: UPCOMING SCHEDULE / SESSIONS */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-indigo-400" />
+              <h3 className="text-sm font-bold text-white">Upcoming Mentorship Sessions</h3>
+            </div>
+            {onNavigate && (
+              <button
+                onClick={() => onNavigate('meetings')}
+                className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition-colors"
+              >
+                Schedule & Meetings <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {loadingWorkflow ? (
+            <div className="p-6 text-center text-xs text-slate-400">Loading schedule...</div>
+          ) : upcomingMeetings.length === 0 ? (
+            <div className="p-6 text-center rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+              <Calendar className="w-8 h-8 text-slate-600 mx-auto" />
+              <p className="text-xs text-slate-300 font-medium">No upcoming sessions scheduled right now.</p>
+              <p className="text-[11px] text-slate-500">
+                Sessions scheduled by your mentor ({student.mentorName || 'Faculty Mentor'}) will appear here automatically.
+              </p>
+              {onNavigate && (
+                <button
+                  onClick={() => onNavigate('meetings')}
+                  className="mt-2 px-3 py-1.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold text-xs transition-all inline-flex items-center gap-1.5"
+                >
+                  Open Meeting Scheduler
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {upcomingMeetings.slice(0, 3).map((m) => (
+                <div
+                  key={m.id}
+                  className="p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between gap-3 hover:border-slate-700 transition-all"
+                >
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                      {m.title}
+                      <span className="px-2 py-0.5 text-[9px] uppercase font-bold rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                        Upcoming
+                      </span>
+                    </h4>
+                    <p className="text-[11px] text-slate-400 flex items-center gap-2 font-mono">
+                      <span>📅 {m.date}</span>
+                      <span>⏰ {m.time || '11:00'}</span>
+                    </p>
+                    {m.agenda && (
+                      <p className="text-[11px] text-slate-300 italic line-clamp-1">"{m.agenda}"</p>
+                    )}
+                  </div>
+                  <span className="text-[10px] text-indigo-300 shrink-0 font-medium bg-indigo-950/80 px-2.5 py-1 rounded-lg border border-indigo-800/60">
+                    With {m.mentorName}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* PANEL 2: ACTIVE INTERVENTIONS & ACTION PLANS */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-rose-400" />
+              <h3 className="text-sm font-bold text-white">Mentorship Action Plans & Support</h3>
+            </div>
+            {onNavigate && (
+              <button
+                onClick={() => onNavigate('interventions')}
+                className="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1 transition-colors"
+              >
+                All Interventions <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {loadingWorkflow ? (
+            <div className="p-6 text-center text-xs text-slate-400">Loading intervention records...</div>
+          ) : activeInterventions.length === 0 ? (
+            <div className="p-6 text-center rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
+              <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
+              <p className="text-xs text-slate-200 font-medium">Good Standing — No Active Action Plans</p>
+              <p className="text-[11px] text-slate-500">
+                You currently have no critical academic warnings or active interventions. Keep up the consistent effort!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activeInterventions.slice(0, 3).map((item) => (
+                <div
+                  key={item.id}
+                  className="p-3.5 rounded-xl bg-slate-950 border border-rose-900/40 space-y-2 hover:border-rose-800/70 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="font-bold text-white text-xs block">
+                        {item.category} Intervention
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        Mentor: <strong className="text-indigo-300">{item.mentorName}</strong>
+                      </span>
+                    </div>
+                    <span
+                      className={`px-2 py-0.5 text-[9px] font-extrabold uppercase rounded border ${
+                        item.status === 'IN_PROGRESS'
+                          ? 'bg-indigo-950 text-indigo-300 border-indigo-800'
+                          : 'bg-rose-950 text-rose-300 border-rose-800'
+                      }`}
+                    >
+                      {item.status.replace('_', ' ')}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-300 bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                    <div>
+                      <span className="text-slate-400 block">Target CGPA:</span>
+                      <strong className="text-indigo-300">{item.targetCgpa ?? '8.5'}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block">Target Attendance:</span>
+                      <strong className="text-emerald-300">{item.targetAttendance ?? 85}%</strong>
+                    </div>
+                  </div>
+
+                  {item.description && (
+                    <p className="text-[11px] text-slate-300 line-clamp-2 italic">
+                      "{item.description}"
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -290,4 +465,3 @@ export const StudentDashboardOverview: React.FC<StudentDashboardOverviewProps> =
     </div>
   );
 };
-

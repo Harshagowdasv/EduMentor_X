@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Meeting, Student } from '../../types';
+import { Meeting, Student, Mentor } from '../../types';
 import { dbService } from '../../services/serviceFactory';
 import { Modal } from '../common/Modal';
-import { Calendar, Clock, Plus, CheckCircle2, XCircle, RefreshCw, UserCheck, FileText } from 'lucide-react';
+import { Calendar, Clock, Plus, CheckCircle2, XCircle, RefreshCw, UserCheck, FileText, User } from 'lucide-react';
 
 interface MeetingSchedulerProps {
   userRole: 'admin' | 'mentor' | 'student';
@@ -13,6 +13,7 @@ interface MeetingSchedulerProps {
 export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, userId, userName }) => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
+  const [assignedMentor, setAssignedMentor] = useState<Mentor | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -32,12 +33,34 @@ export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, us
     setLoading(true);
     try {
       const filter = userRole === 'student' ? { studentId: userId } : userRole === 'mentor' ? { mentorId: userId } : {};
-      const [mList, stRes] = await Promise.all([
+      const [mList, stRes, studentSelf] = await Promise.all([
         dbService.getMeetings(filter),
         userRole !== 'student' ? dbService.getStudents(1, 200) : Promise.resolve({ students: [] }),
+        userRole === 'student' ? dbService.getStudentById(userId) : Promise.resolve(null),
       ]);
       setMeetings(mList);
       setStudents(stRes.students);
+
+      if (studentSelf && studentSelf.mentorId) {
+        const mentors = await dbService.getMentors();
+        const m = mentors.find((x) => x.id === studentSelf.mentorId || x.userId === studentSelf.mentorId);
+        if (m) {
+          setAssignedMentor(m);
+        } else if (studentSelf.mentorName) {
+          setAssignedMentor({
+            id: studentSelf.mentorId,
+            userId: studentSelf.mentorId,
+            name: studentSelf.mentorName,
+            email: studentSelf.mentorEmail || '',
+            phone: '',
+            department: studentSelf.department || '',
+            staffId: '',
+            activeMenteesCount: 1,
+            status: 'active',
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
     } catch (err) {
       console.error('Failed to load meetings:', err);
     } finally {
@@ -47,25 +70,41 @@ export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, us
 
   const handleCreateMeeting = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedStudentId || !title || !date) return;
+    if (!title || !date) return;
     setSaving(true);
 
-    const st = students.find((s) => s.id === selectedStudentId);
-
     try {
-      await dbService.createMeeting(
-        {
-          studentId: selectedStudentId,
-          studentName: st ? st.name : 'Student',
-          mentorId: userId,
-          mentorName: userName,
-          title,
-          date,
-          time,
-          agenda,
-        },
-        userId
-      );
+      if (userRole === 'student') {
+        await dbService.createMeeting(
+          {
+            studentId: userId,
+            studentName: userName,
+            mentorId: assignedMentor ? assignedMentor.id : 'm4',
+            mentorName: assignedMentor ? assignedMentor.name : 'Faculty Mentor',
+            title,
+            date,
+            time,
+            agenda,
+          },
+          userId
+        );
+      } else {
+        if (!selectedStudentId) return;
+        const st = students.find((s) => s.id === selectedStudentId);
+        await dbService.createMeeting(
+          {
+            studentId: selectedStudentId,
+            studentName: st ? st.name : 'Student',
+            mentorId: userId,
+            mentorName: userName,
+            title,
+            date,
+            time,
+            agenda,
+          },
+          userId
+        );
+      }
       setIsModalOpen(false);
       setTitle('');
       setAgenda('');
@@ -96,17 +135,20 @@ export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, us
             <Calendar className="w-5 h-5 text-indigo-400" />
             Mentor-Student Meeting Scheduler
           </h2>
-          <p className="text-xs text-slate-400 mt-1">Schedule, review, and track guidance sessions</p>
+          <p className="text-xs text-slate-400 mt-1">
+            {userRole === 'student'
+              ? 'View upcoming sessions and schedule guidance appointments with your mentor'
+              : 'Schedule, review, and track guidance sessions with your mentees'}
+          </p>
         </div>
 
-        {userRole !== 'student' && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2"
-          >
-            <Plus className="w-4 h-4" /> Schedule New Meeting
-          </button>
-        )}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-bold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 shrink-0"
+        >
+          <Plus className="w-4 h-4" />
+          {userRole === 'student' ? 'Request Meeting with Mentor' : 'Schedule New Meeting'}
+        </button>
       </div>
 
       {/* Overview Cards */}
@@ -156,22 +198,45 @@ export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, us
                         {m.status}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1 flex items-center gap-3">
-                      <span>Date: <strong className="text-white">{m.date}</strong></span>
-                      <span>Time: <strong className="text-white">{m.time}</strong></span>
-                      <span>With: <strong className="text-indigo-300">{userRole === 'student' ? m.mentorName : m.studentName}</strong></span>
-                    </p>
-                    {m.agenda && <p className="text-xs text-slate-300 mt-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800/80">Agenda: "{m.agenda}"</p>}
+
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400 mt-1">
+                      <span className="flex items-center gap-1 font-mono">
+                        <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                        {m.date} at {m.time}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        Student: <strong className="text-white">{m.studentName}</strong>
+                      </span>
+                      <span>•</span>
+                      <span>
+                        Mentor: <strong className="text-white">{m.mentorName}</strong>
+                      </span>
+                    </div>
+
+                    {m.agenda && (
+                      <p className="text-xs text-slate-300 mt-2 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+                        {m.agenda}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-end md:self-center">
+                <div className="flex items-center gap-2 self-end md:self-center shrink-0">
                   {m.status === 'upcoming' && (
                     <button
                       onClick={() => handleUpdateStatus(m.id, 'completed')}
-                      className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-emerald-600/30"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-950 hover:bg-emerald-900 border border-emerald-800 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-all"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" /> Mark Completed
+                    </button>
+                  )}
+                  {m.status === 'completed' && (
+                    <button
+                      onClick={() => handleUpdateStatus(m.id, 'upcoming')}
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    >
+                      <RefreshCw className="w-3.5 h-3.5" /> Re-open
                     </button>
                   )}
                 </div>
@@ -181,25 +246,35 @@ export const MeetingScheduler: React.FC<MeetingSchedulerProps> = ({ userRole, us
         )}
       </div>
 
-      {/* Schedule Meeting Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Schedule Faculty Mentor Session">
+      {/* Modal: Schedule Meeting */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={userRole === 'student' ? 'Request Mentorship Session' : 'Schedule Mentorship Session'}>
         <form onSubmit={handleCreateMeeting} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-bold text-slate-300 mb-1">Select Student</label>
-            <select
-              required
-              value={selectedStudentId}
-              onChange={(e) => setSelectedStudentId(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
-            >
-              <option value="">Select Student...</option>
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name} ({s.usn}) — CGPA {s.cgpa}
-                </option>
-              ))}
-            </select>
-          </div>
+          {userRole !== 'student' ? (
+            <div>
+              <label className="block font-bold text-slate-300 mb-1">Select Mentee</label>
+              <select
+                required
+                value={selectedStudentId}
+                onChange={(e) => setSelectedStudentId(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              >
+                <option value="">Select Student...</option>
+                {students.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.usn}) — CGPA {s.cgpa}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-3">
+              <UserCheck className="w-5 h-5 text-indigo-400 shrink-0" />
+              <div>
+                <p className="text-slate-400 text-[11px]">Scheduling Session with Mentor:</p>
+                <p className="text-white font-bold text-xs">{assignedMentor ? assignedMentor.name : 'Faculty Mentor'}</p>
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block font-bold text-slate-300 mb-1">Meeting Title</label>

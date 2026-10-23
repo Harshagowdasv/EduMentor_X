@@ -6,12 +6,12 @@ import { getStorage } from 'firebase/storage';
 const env = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : (process.env || {});
 
 const firebaseConfig = {
-  apiKey: env.VITE_FIREBASE_API_KEY || '',
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || '',
-  projectId: env.VITE_FIREBASE_PROJECT_ID || '',
-  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: env.VITE_FIREBASE_APP_ID || '',
+  apiKey: env.VITE_FIREBASE_API_KEY || 'AIzaSyA_2YPrUcM9syjb3SGi-7BeL_SpMByOh14',
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || 'edumentorx-ab2e1.firebaseapp.com',
+  projectId: env.VITE_FIREBASE_PROJECT_ID || 'edumentorx-ab2e1',
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || 'edumentorx-ab2e1.firebasestorage.app',
+  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '911088982966',
+  appId: env.VITE_FIREBASE_APP_ID || '1:911088982966:web:ac20aebf928d68a0457f17',
 };
 
 export const isFirebaseConfigured = Boolean(

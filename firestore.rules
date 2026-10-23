@@ -58,6 +58,17 @@ service cloud.firestore {
             : request.auth.uid);
     }
 
+    // Resolves canonical student ID / USN if stored on custom claims or user profile
+    function getStudentId() {
+      return request.auth.token.studentId != null
+        ? request.auth.token.studentId
+        : (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().studentId != null
+            ? getUserData().studentId
+            : (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().usn != null
+                ? getUserData().usn
+                : request.auth.uid));
+    }
+
     // Active Allocation Check: Verifies if active allocation exists between mentorId and studentId
     function hasActiveAllocation(mentorId, studentId) {
       return (
@@ -105,11 +116,22 @@ service cloud.firestore {
     // 3. STUDENTS COLLECTION (Mentors access ONLY assigned mentees; Students access own data)
     match /students/{studentId} {
       allow read: if isAdmin() ||
-                  (isStudent() && (isOwner(studentId) || (resource.data.userId != null && resource.data.userId == request.auth.uid))) ||
+                  (isStudent() && (
+                    isOwner(studentId) ||
+                    studentId == getStudentId() ||
+                    (resource.data.userId != null && resource.data.userId == request.auth.uid) ||
+                    (resource.data.uid != null && resource.data.uid == request.auth.uid) ||
+                    (resource.data.email != null && resource.data.email == request.auth.token.email)
+                  )) ||
                   isAssignedMentor(studentId);
 
       allow write: if isAdmin();
-      allow update: if isStudent() && (isOwner(studentId) || (resource.data.userId != null && resource.data.userId == request.auth.uid)) &&
+      allow update: if isStudent() && (
+                      isOwner(studentId) ||
+                      studentId == getStudentId() ||
+                      (resource.data.userId != null && resource.data.userId == request.auth.uid) ||
+                      (resource.data.uid != null && resource.data.uid == request.auth.uid)
+                    ) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny([
                        'role', 'mentorId', 'mentorName', 'mentorEmail', 'riskLevel', 'riskReasons',
                        'usn', 'cgpa', 'attendance', 'financialScore', 'studyHours',
@@ -199,27 +221,43 @@ service cloud.firestore {
     // 10. MEETINGS & FOLLOW-UP TASKS (Mentor access requires active allocation)
     match /meetings/{meetingId} {
       allow read: if isAdmin() ||
-                  (isStudent() && resource.data.studentId == request.auth.uid) ||
+                  (isStudent() && (
+                    resource.data.studentId == request.auth.uid ||
+                    resource.data.studentId == getStudentId() ||
+                    (resource.data.studentUsn != null && resource.data.studentUsn == getStudentId())
+                  )) ||
                   (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId));
 
       allow create: if isAdmin() ||
-                     (isMentor() && (request.resource.data.mentorId == request.auth.uid || request.resource.data.mentorId == getMentorId()) && isAssignedMentor(request.resource.data.studentId));
+                     (isMentor() && (request.resource.data.mentorId == request.auth.uid || request.resource.data.mentorId == getMentorId()) && isAssignedMentor(request.resource.data.studentId)) ||
+                     (isStudent() && (request.resource.data.studentId == request.auth.uid || request.resource.data.studentId == getStudentId()));
 
-      allow update, delete: if isAdmin() ||
-                             (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId));
+      allow update: if isAdmin() ||
+                     (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId)) ||
+                     (isStudent() && (resource.data.studentId == request.auth.uid || resource.data.studentId == getStudentId()));
+
+      allow delete: if isAdmin() ||
+                     (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId));
     }
 
     match /followUpTasks/{taskId} {
       allow read: if isAdmin() ||
-                  (isStudent() && resource.data.studentId == request.auth.uid) ||
+                  (isStudent() && (
+                    resource.data.studentId == request.auth.uid ||
+                    resource.data.studentId == getStudentId()
+                  )) ||
                   (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId));
 
       allow create: if isAdmin() ||
-                     (isMentor() && (request.resource.data.mentorId == request.auth.uid || request.resource.data.mentorId == getMentorId()) && isAssignedMentor(request.resource.data.studentId));
+                     (isMentor() && (request.resource.data.mentorId == request.auth.uid || request.resource.data.mentorId == getMentorId()) && isAssignedMentor(request.resource.data.studentId)) ||
+                     (isStudent() && (request.resource.data.studentId == request.auth.uid || request.resource.data.studentId == getStudentId()));
 
       allow update: if isAdmin() ||
-                     (isStudent() && resource.data.studentId == request.auth.uid) ||
-                     (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(request.resource.data.studentId));
+                     (isStudent() && (resource.data.studentId == request.auth.uid || resource.data.studentId == getStudentId())) ||
+                     (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId));
+
+      allow delete: if isAdmin() ||
+                     (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId()) && isAssignedMentor(resource.data.studentId));
     }
 
     // 11. COURSES & ACTIVITIES (Creation requires active allocation to student)
@@ -298,7 +336,12 @@ service cloud.firestore {
     // 14. INTERVENTIONS, FEEDBACK, AI SUMMARIES & MEMORIES (Require active allocation)
     match /interventions/{intervId} {
       allow read: if isAdmin() ||
-                  (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId() || isAssignedMentor(resource.data.studentId)));
+                  (isMentor() && (resource.data.mentorId == request.auth.uid || resource.data.mentorId == getMentorId() || isAssignedMentor(resource.data.studentId))) ||
+                  (isStudent() && (
+                    resource.data.studentId == request.auth.uid ||
+                    resource.data.studentId == getStudentId() ||
+                    (resource.data.studentUsn != null && resource.data.studentUsn == getStudentId())
+                  ));
       allow create, update: if isAdmin() || (isMentor() && isAssignedMentor(request.resource.data.studentId));
     }
 

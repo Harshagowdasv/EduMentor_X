@@ -13,6 +13,8 @@ export interface User {
   mustChangePassword?: boolean;
   mentorId?: string;
   userId?: string;
+  studentId?: string;
+  usn?: string;
 }
 
 export interface Mentor {
@@ -603,6 +605,8 @@ export interface InterventionRecord {
   followUpTaskIds: string[];
   baselineCgpa: number;
   baselineAttendance: number;
+  targetCgpa?: number;
+  targetAttendance?: number;
   outcomeCgpa?: number;
   outcomeAttendance?: number;
   outcomeNotes?: string;
