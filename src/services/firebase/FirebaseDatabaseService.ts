@@ -44,7 +44,7 @@ import {
   recordSharedFirestoreFailure,
   recordSharedFirestoreSuccess
 } from './firebaseConfig';
-import { collection, getDocs, doc, setDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc, setDoc, query, where } from 'firebase/firestore';
 
 export class FirebaseDatabaseService implements IDatabaseService {
   private fallback: DemoDatabaseService;
@@ -144,7 +144,7 @@ export class FirebaseDatabaseService implements IDatabaseService {
     recordSharedFirestoreSuccess();
   }
 
-  private async safeFirestoreQuery<T extends { size?: number; docs?: any[] }>(
+  private async safeFirestoreQuery<T>(
     op: () => Promise<T>,
     customTimeoutMs?: number
   ): Promise<T | null> {
@@ -175,8 +175,8 @@ export class FirebaseDatabaseService implements IDatabaseService {
         }),
         timeoutPromise,
       ]);
-      if (res && typeof res.size === 'number') {
-        this.firestoreReadCount += Math.max(1, res.size);
+      if (res && typeof (res as any).size === 'number') {
+        this.firestoreReadCount += Math.max(1, (res as any).size);
       } else if (res) {
         this.firestoreReadCount += 1;
       }
@@ -333,13 +333,12 @@ export class FirebaseDatabaseService implements IDatabaseService {
     }
 
     try {
-      const [mentorsSnap, usersSnap, fallbackMentors] = await Promise.all([
+      const [mentorsSnap, fallbackMentors] = await Promise.all([
         this.safeFirestoreQuery(() => getDocs(collection(db!, 'mentors'))),
-        this.safeFirestoreQuery(() => getDocs(query(collection(db!, 'users'), where('role', '==', 'mentor')))),
         this.fallback.getMentors(),
       ]);
 
-      if (!mentorsSnap && !usersSnap && options?.requireFirestore) {
+      if (!mentorsSnap && options?.requireFirestore) {
         throw new Error(`Database temporarily unavailable (${this.lastFirestoreError || 'Failed to read mentors from Firestore'}). Please retry.`);
       }
 
@@ -363,27 +362,6 @@ export class FirebaseDatabaseService implements IDatabaseService {
         });
       }
 
-      if (usersSnap) {
-        usersSnap.forEach((uDoc: any) => {
-          const uData = uDoc.data();
-          const existing = mentorsList.find(m => m.userId === uDoc.id || m.email.toLowerCase() === (uData.email || '').toLowerCase());
-          if (!existing) {
-            mentorsList.push({
-              id: uDoc.id,
-              userId: uDoc.id,
-              name: uData.name || 'Faculty Mentor',
-              email: uData.email || '',
-              phone: uData.phone || '',
-              department: uData.department || 'General',
-              staffId: uData.staffId || uDoc.id.substring(0, 8),
-              activeMenteesCount: uData.activeMenteesCount || 0,
-              status: uData.status === 'inactive' || uData.status === 'deactivated' ? 'inactive' : 'active',
-              createdAt: uData.createdAt || new Date().toISOString(),
-            });
-          }
-        });
-      }
-
       for (const fbM of fallbackMentors) {
         if (!mentorsList.some(m => m.email.toLowerCase() === fbM.email.toLowerCase() || m.id === fbM.id)) {
           mentorsList.push(fbM);
@@ -391,7 +369,7 @@ export class FirebaseDatabaseService implements IDatabaseService {
       }
 
       // Only cache if Firestore succeeded or fallback returned valid seed data
-      if (mentorsSnap || usersSnap || mentorsList.length > 0) {
+      if (mentorsSnap || mentorsList.length > 0) {
         this.mentorCache = { data: mentorsList, timestamp: Date.now() };
       }
       return mentorsList;
@@ -720,6 +698,17 @@ export class FirebaseDatabaseService implements IDatabaseService {
     }
     this.cacheMissCount++;
 
+    const mentors = await this.getMentors();
+    const targetMentor = mentors.find(
+      (m) => m.id === mentorId || m.userId === mentorId || (m.email && m.email.toLowerCase() === mentorId.toLowerCase())
+    );
+    const candidateIds = new Set<string>([mentorId]);
+    if (targetMentor) {
+      candidateIds.add(targetMentor.id);
+      if (targetMentor.userId) candidateIds.add(targetMentor.userId);
+      if (targetMentor.email) candidateIds.add(targetMentor.email.toLowerCase());
+    }
+
     if (!isFirebaseConfigured || !db || this.isCircuitOpen()) {
       if (options?.requireFirestore) {
         throw new Error(`Database temporarily unavailable (${this.lastFirestoreError || 'Firestore circuit breaker open'}). Please retry.`);
@@ -730,55 +719,101 @@ export class FirebaseDatabaseService implements IDatabaseService {
     }
 
     try {
-      const [allocSnap, fallbackStudents, allStudentsRes] = await Promise.all([
+      const allocQueries = Array.from(candidateIds).map((cId) =>
         this.safeFirestoreQuery(() =>
-          getDocs(query(collection(db!, 'mentorAllocations'), where('mentorId', '==', mentorId), where('status', '==', 'ACTIVE')))
-        ),
+          getDocs(query(collection(db!, 'mentorAllocations'), where('mentorId', '==', cId), where('status', '==', 'ACTIVE')))
+        )
+      );
+
+      const [allocSnaps, fallbackStudents] = await Promise.all([
+        Promise.all(allocQueries),
         this.fallback.getStudentsByMentorId(mentorId),
-        this.getStudents(1, 1000, undefined, options),
       ]);
 
-      if (!allocSnap && options?.requireFirestore) {
-        throw new Error(`Database temporarily unavailable (${this.lastFirestoreError || 'Failed to read mentorAllocations'}). Please retry.`);
-      }
-
       const studentIds = new Set<string>();
-      if (allocSnap) {
-        allocSnap.forEach((d: any) => studentIds.add(d.data().studentId));
+      for (const snap of allocSnaps) {
+        if (snap) {
+          snap.forEach((d: any) => studentIds.add(d.data().studentId));
+        }
       }
 
-      const fallbackMap = new Map<string, Student>();
       for (const s of fallbackStudents) {
         studentIds.add(s.id);
-        fallbackMap.set(s.id, s);
-        fallbackMap.set(s.usn, s);
       }
 
-      const allocatedFromAll = allStudentsRes.students.filter((s) => {
-        const match = fallbackMap.get(s.id) || fallbackMap.get(s.usn);
-        const activeMentorId = match?.mentorId !== undefined ? match.mentorId : s.mentorId;
-        return studentIds.has(s.id) || activeMentorId === mentorId;
-      });
+      // Fetch each allocated student directly via getDoc (fully authorized under mentor security rules)
+      const studentDocPromises = Array.from(studentIds).map((stId) =>
+        this.safeFirestoreQuery(() => getDoc(doc(db!, 'students', stId)))
+      );
+      const studentDocSnaps = await Promise.all(studentDocPromises);
 
-      const merged = allocatedFromAll.map((s) => {
-        const match = fallbackMap.get(s.id) || fallbackMap.get(s.usn);
-        if (!match) return s;
-        return {
-          ...s,
-          mentorId: match.mentorId || s.mentorId,
-          mentorName: match.mentorName || s.mentorName,
-          mentorEmail: match.mentorEmail || s.mentorEmail,
-          cgpa: typeof match.cgpa === 'number' ? match.cgpa : s.cgpa,
-          attendance: typeof match.attendance === 'number' ? match.attendance : s.attendance,
-          previousYearBacklogs: typeof match.previousYearBacklogs === 'number' ? match.previousYearBacklogs : s.previousYearBacklogs,
-          currentBacklogs: typeof match.currentBacklogs === 'number' ? match.currentBacklogs : s.currentBacklogs,
-          riskLevel: match.riskLevel || s.riskLevel,
-          riskReasons: match.riskReasons || s.riskReasons,
-        };
-      });
+      const firestoreStudentsMap = new Map<string, Student>();
+      for (const snap of studentDocSnaps) {
+        if (snap && snap.exists()) {
+          const data = snap.data();
+          if (data.status !== 'DELETED' && data.academicStatus !== 'DELETED') {
+            firestoreStudentsMap.set(snap.id, {
+              id: snap.id,
+              userId: data.uid || data.userId || snap.id,
+              usn: data.usn || snap.id,
+              name: data.name || 'Student',
+              email: data.email || '',
+              phone: data.phone || '',
+              parentPhone: data.parentPhone || '',
+              department: data.department || 'Computer Science & Engineering',
+              program: data.program || 'B.Tech',
+              year: data.year || '3rd Year',
+              semester: data.semester || 'Semester 6',
+              section: data.section || 'A',
+              admissionYear: data.admissionYear || '2023',
+              mentorId: data.mentorId || targetMentor?.id || mentorId,
+              mentorName: data.mentorName || targetMentor?.name,
+              mentorEmail: data.mentorEmail || targetMentor?.email,
+              cgpa: typeof data.cgpa === 'number' ? data.cgpa : 8.0,
+              attendance: typeof data.attendance === 'number' ? data.attendance : 85,
+              financialScore: data.financialScore ?? 5,
+              studyHours: data.studyHours ?? 15,
+              previousYearBacklogs: data.previousYearBacklogs ?? 0,
+              currentBacklogs: data.currentBacklogs ?? 0,
+              academicStatus: data.academicStatus || 'Active',
+              riskLevel: data.riskLevel || 'GOOD_PERFORMANCE',
+              riskReasons: data.riskReasons || [],
+              createdAt: data.createdAt || new Date().toISOString(),
+            });
+          }
+        }
+      }
 
-      this.mentorStudentsCache.set(mentorId, { data: merged, timestamp: Date.now() });
-      return merged;
+      // Merge with fallback students if any are missing from Firestore
+      const finalStudents: Student[] = [];
+      const seenIds = new Set<string>();
+
+      for (const [sId, st] of firestoreStudentsMap.entries()) {
+        finalStudents.push(st);
+        seenIds.add(sId);
+        if (st.usn) seenIds.add(st.usn);
+      }
+
+      for (const fbS of fallbackStudents) {
+        if (!seenIds.has(fbS.id) && (!fbS.usn || !seenIds.has(fbS.usn))) {
+          finalStudents.push({
+            ...fbS,
+            mentorId: fbS.mentorId || targetMentor?.id || mentorId,
+            mentorName: fbS.mentorName || targetMentor?.name,
+            mentorEmail: fbS.mentorEmail || targetMentor?.email,
+          });
+          seenIds.add(fbS.id);
+        }
+      }
+
+      this.mentorStudentsCache.set(mentorId, { data: finalStudents, timestamp: Date.now() });
+      if (targetMentor) {
+        this.mentorStudentsCache.set(targetMentor.id, { data: finalStudents, timestamp: Date.now() });
+        if (targetMentor.userId) {
+          this.mentorStudentsCache.set(targetMentor.userId, { data: finalStudents, timestamp: Date.now() });
+        }
+      }
+      return finalStudents;
     } catch (err) {
       if (options?.requireFirestore) throw err;
       const list = await this.fallback.getStudentsByMentorId(mentorId);
@@ -899,6 +934,14 @@ export class FirebaseDatabaseService implements IDatabaseService {
     const res = await this.fallback.bulkAllocateStudents(studentIds, mentorId, changedBy, options);
     if (db && isFirebaseConfigured && Date.now() >= this.firestoreOfflineUntil) {
       try {
+        const mentors = await this.getMentors();
+        const targetMentor = mentors.find(
+          (m) => m.id === mentorId || m.userId === mentorId || (m.email && m.email.toLowerCase() === mentorId.toLowerCase())
+        );
+        const canonicalMentorId = targetMentor ? targetMentor.id : mentorId;
+        const mentorName = targetMentor?.name || '';
+        const mentorEmail = targetMentor?.email || '';
+
         for (const stId of studentIds) {
           if (this.isCircuitOpen()) break;
           const prevAllocs = await this.safeFirestoreQuery(() =>
@@ -906,7 +949,7 @@ export class FirebaseDatabaseService implements IDatabaseService {
           );
           if (prevAllocs) {
             for (const docSnap of prevAllocs.docs) {
-              if (docSnap.data().mentorId !== mentorId) {
+              if (docSnap.data().mentorId !== canonicalMentorId) {
                 await this.safeFirestoreWrite(() =>
                   setDoc(doc(db!, 'mentorAllocations', docSnap.id), { status: 'REASSIGNED' }, { merge: true })
                 );
@@ -914,12 +957,14 @@ export class FirebaseDatabaseService implements IDatabaseService {
             }
           }
 
-          const allocId = `${mentorId}_${stId}`;
+          const allocId = `${canonicalMentorId}_${stId}`;
           await Promise.all([
             this.safeFirestoreWrite(() =>
               setDoc(doc(db!, 'mentorAllocations', allocId), {
                 id: allocId,
-                mentorId,
+                mentorId: canonicalMentorId,
+                mentorUserId: targetMentor?.userId || '',
+                mentorName,
                 studentId: stId,
                 changedBy,
                 reason: options?.reason || 'Administrative mentee mapping',
@@ -929,16 +974,32 @@ export class FirebaseDatabaseService implements IDatabaseService {
             ),
             this.safeFirestoreWrite(() =>
               setDoc(doc(db!, 'students', stId), {
-                mentorId,
+                mentorId: canonicalMentorId,
+                mentorName,
+                mentorEmail,
               }, { merge: true })
             ),
           ]);
+        }
+
+        if (targetMentor && targetMentor.id) {
+          const countSnap = await this.safeFirestoreQuery(() =>
+            getDocs(query(collection(db!, 'mentorAllocations'), where('mentorId', '==', canonicalMentorId), where('status', '==', 'ACTIVE')))
+          );
+          const activeCount = countSnap ? countSnap.size : 0;
+          await this.safeFirestoreWrite(() =>
+            setDoc(doc(db!, 'mentors', targetMentor.id), {
+              activeMenteesCount: activeCount,
+            }, { merge: true })
+          );
         }
       } catch (e: any) {
         console.warn('[Firestore Bulk Allocation Write Notice]:', e.message);
       }
     }
     this.invalidateCache('allocation');
+    this.invalidateCache('mentor');
+    this.invalidateCache('student');
     return res;
   }
 
@@ -1468,19 +1529,112 @@ export class FirebaseDatabaseService implements IDatabaseService {
       return cached.data;
     }
     this.cacheMissCount++;
-    const list = await this.fallback.getInterventions(filter);
+
+    let firestoreList: InterventionRecord[] = [];
+    if (isFirebaseConfigured && db && !this.isCircuitOpen()) {
+      try {
+        let snap: any = null;
+        if (filter?.mentorId) {
+          const filterMentorId = filter.mentorId;
+          const mentors = await this.getMentors();
+          const targetMentor = mentors.find(
+            (m) => m.id === filterMentorId || m.userId === filterMentorId || (m.email && m.email.toLowerCase() === filterMentorId.toLowerCase())
+          );
+          const candidateMentorIds = new Set<string>([filterMentorId]);
+          if (targetMentor) {
+            candidateMentorIds.add(targetMentor.id);
+            if (targetMentor.userId) candidateMentorIds.add(targetMentor.userId);
+            if (targetMentor.email) candidateMentorIds.add(targetMentor.email.toLowerCase());
+          }
+
+          const queries = Array.from(candidateMentorIds).map((mId) =>
+            this.safeFirestoreQuery(() =>
+              getDocs(query(collection(db!, 'interventions'), where('mentorId', '==', mId)))
+            )
+          );
+          const snaps = await Promise.all(queries);
+          for (const s of snaps) {
+            if (s) {
+              s.forEach((d: any) => {
+                firestoreList.push({ id: d.id, ...d.data() } as InterventionRecord);
+              });
+            }
+          }
+        } else if (filter?.studentId) {
+          snap = await this.safeFirestoreQuery(() =>
+            getDocs(query(collection(db!, 'interventions'), where('studentId', '==', filter.studentId)))
+          );
+          if (snap) {
+            snap.forEach((d: any) => {
+              firestoreList.push({ id: d.id, ...d.data() } as InterventionRecord);
+            });
+          }
+        } else {
+          snap = await this.safeFirestoreQuery(() =>
+            getDocs(collection(db!, 'interventions'))
+          );
+          if (snap) {
+            snap.forEach((d: any) => {
+              firestoreList.push({ id: d.id, ...d.data() } as InterventionRecord);
+            });
+          }
+        }
+      } catch (e: any) {
+        console.warn('[Firestore getInterventions Read Notice]:', e.message);
+      }
+    }
+
+    const fallbackList = await this.fallback.getInterventions(filter);
+    const mergedMap = new Map<string, InterventionRecord>();
+    for (const item of firestoreList) mergedMap.set(item.id, item);
+    for (const item of fallbackList) {
+      if (!mergedMap.has(item.id)) mergedMap.set(item.id, item);
+    }
+    let list = Array.from(mergedMap.values());
+
+    if (filter?.status) {
+      list = list.filter((i) => i.status === filter.status);
+    }
+
+    list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     this.interventionsCache.set(key, { data: list, timestamp: Date.now() });
     return list;
   }
 
   async createIntervention(intervention: Omit<InterventionRecord, 'id' | 'createdAt'>, actorId: string): Promise<InterventionRecord> {
     const created = await this.fallback.createIntervention(intervention, actorId);
+    if (db && isFirebaseConfigured && Date.now() >= this.firestoreOfflineUntil) {
+      try {
+        await this.safeFirestoreWrite(() =>
+          setDoc(doc(db!, 'interventions', created.id), {
+            ...created,
+          })
+        );
+      } catch (e: any) {
+        console.warn('[Firestore createIntervention Write Notice]:', e.message);
+      }
+    }
     this.interventionsCache.clear();
     return created;
   }
 
   async updateInterventionStatus(interventionId: string, status: InterventionRecord['status'], actionsTaken?: string[], outcomeCgpa?: number, outcomeAttendance?: number, actorId?: string): Promise<InterventionRecord> {
     const updated = await this.fallback.updateInterventionStatus(interventionId, status, actionsTaken, outcomeCgpa, outcomeAttendance, actorId);
+    if (db && isFirebaseConfigured && Date.now() >= this.firestoreOfflineUntil) {
+      try {
+        await this.safeFirestoreWrite(() =>
+          setDoc(doc(db!, 'interventions', interventionId), {
+            status,
+            actionsTaken: actionsTaken || [],
+            outcomeCgpa: outcomeCgpa ?? null,
+            outcomeAttendance: outcomeAttendance ?? null,
+            updatedAt: new Date().toISOString(),
+          }, { merge: true })
+        );
+      } catch (e: any) {
+        console.warn('[Firestore updateInterventionStatus Write Notice]:', e.message);
+      }
+    }
     this.interventionsCache.clear();
     return updated;
   }

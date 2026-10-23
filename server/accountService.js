@@ -74,6 +74,7 @@ export async function createMentorAuthAccount({ name, email, phone, department, 
   try {
     await adminDb.collection('users').doc(userRecord.uid).set({
       uid: userRecord.uid,
+      mentorId: mentorId,
       id: userRecord.uid,
       name: (name || '').trim(),
       email: cleanEmail,

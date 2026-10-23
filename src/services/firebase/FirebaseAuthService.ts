@@ -373,14 +373,37 @@ export class FirebaseAuthService implements IAuthService {
       `role=${finalRole},mustChangePw=${mustChangePassword}`
     );
 
+    let mentorId: string | undefined = userDocRes.data?.mentorId;
+    if (finalRole === 'mentor') {
+      try {
+        const { dbService } = await import('../serviceFactory');
+        const mentors = await dbService.getMentors();
+        const mRecord = mentors.find(
+          (m) => m.userId === fbUser.uid || m.id === fbUser.uid || (emailLower && m.email.toLowerCase() === emailLower)
+        );
+        if (mRecord) {
+          mentorId = mentorId || mRecord.id;
+          if (!name || name === 'User' || name === fbUser.email?.split('@')[0]) name = mRecord.name;
+          if (!department || department === 'Institutional Administration') department = mRecord.department;
+          if (!phone) phone = mRecord.phone;
+        }
+      } catch {
+        // Fallback
+      }
+    }
+
+    const canonicalId = (finalRole === 'mentor' && mentorId) ? mentorId : fbUser.uid;
+
     return {
-      id: fbUser.uid,
+      id: canonicalId,
+      userId: fbUser.uid,
       email: fbUser.email || '',
       name,
       role: finalRole,
       department,
       phone,
       mustChangePassword,
+      mentorId: mentorId || (finalRole === 'mentor' ? canonicalId : undefined),
     };
   }
 }

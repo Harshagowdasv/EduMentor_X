@@ -49,11 +49,13 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Resolves canonical mentor document ID if stored on user profile
+    // Resolves canonical mentor document ID if stored on user profile or custom token claims
     function getMentorId() {
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().mentorId != null
-        ? getUserData().mentorId
-        : request.auth.uid;
+      return request.auth.token.mentorId != null
+        ? request.auth.token.mentorId
+        : (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().mentorId != null
+            ? getUserData().mentorId
+            : request.auth.uid);
     }
 
     // Active Allocation Check: Verifies if active allocation exists between mentorId and studentId
@@ -94,15 +96,9 @@ service cloud.firestore {
       );
     }
 
-    // 2. MENTORS COLLECTION (Access restricted to assigned students, mentor self, or admin)
+    // 2. MENTORS COLLECTION (Institutional faculty directory readable by authenticated institution members)
     match /mentors/{mentorId} {
-      allow read: if isAdmin() ||
-                  (isMentor() && (request.auth.uid == mentorId || getMentorId() == mentorId || (resource.data.userId != null && resource.data.userId == request.auth.uid))) ||
-                  (isStudent() && (
-                    (exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
-                     get(/databases/$(database)/documents/students/$(request.auth.uid)).data.mentorId == mentorId) ||
-                    hasActiveAllocation(mentorId, request.auth.uid)
-                  ));
+      allow read: if isSignedIn();
       allow write: if isAdmin();
     }
 

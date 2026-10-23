@@ -11,6 +11,8 @@ export interface User {
   avatarUrl?: string;
   phone?: string;
   mustChangePassword?: boolean;
+  mentorId?: string;
+  userId?: string;
 }
 
 export interface Mentor {

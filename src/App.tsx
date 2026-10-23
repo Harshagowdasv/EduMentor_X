@@ -294,58 +294,62 @@ const MainApp: React.FC = () => {
           )}
 
           {/* MENTOR PORTAL SECTIONS */}
-          {user.role === 'mentor' && (
-            <>
-              {activeSection === 'overview' && (
-                <MentorCommandCenter
-                  mentorId={user.id}
-                  mentorName={user.name}
-                  onNavigate={(sec) => setActiveSection(sec)}
-                  onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
-                  actorId={user.id}
-                />
-              )}
-              {activeSection === 'mentees' && (
-                <MenteesList
-                  mentorId={user.id}
-                  mentorName={user.name}
-                  onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
-                  actorId={user.id}
-                />
-              )}
-              {activeSection === 'academic-risk' && (
-                <AcademicRiskEarlyWarning
-                  userRole={user.role}
-                  userId={user.id}
-                  onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
-                  onInitiateIntervention={() => setActiveSection('intervention-center')}
-                />
-              )}
-              {activeSection === 'intervention-center' && (
-                <InterventionCenter
-                  mentorId={user.id}
-                  mentorName={user.name}
-                  onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
-                  actorId={user.id}
-                />
-              )}
-              {activeSection === 'recommendations' && (
-                <SmartMentorRecommendations mentorId={user.id} onViewStudent360={(stId) => setSelectedStudent360Id(stId)} />
-              )}
-              {activeSection === 'meetings' && (
-                <MeetingScheduler userRole={user.role} userId={user.id} userName={user.name} />
-              )}
-              {activeSection === 'tasks' && (
-                <FollowUpTaskManager userRole={user.role} userId={user.id} userName={user.name} />
-              )}
-              {activeSection === 'resources' && (
-                <CentralResourceLibrary userRole={user.role} userId={user.id} userName={user.name} department={user.department} />
-              )}
-              {activeSection === 'safety-alerts' && (
-                <AISafetyAlertsDashboard mentorId={user.id} actorId={user.id} />
-              )}
-            </>
-          )}
+          {user.role === 'mentor' && (() => {
+            const effectiveMentorId = user.mentorId || user.id;
+            const effectiveActorId = user.userId || user.id;
+            return (
+              <>
+                {activeSection === 'overview' && (
+                  <MentorCommandCenter
+                    mentorId={effectiveMentorId}
+                    mentorName={user.name}
+                    onNavigate={(sec) => setActiveSection(sec)}
+                    onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
+                    actorId={effectiveActorId}
+                  />
+                )}
+                {activeSection === 'mentees' && (
+                  <MenteesList
+                    mentorId={effectiveMentorId}
+                    mentorName={user.name}
+                    onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
+                    actorId={effectiveActorId}
+                  />
+                )}
+                {activeSection === 'academic-risk' && (
+                  <AcademicRiskEarlyWarning
+                    userRole={user.role}
+                    userId={effectiveMentorId}
+                    onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
+                    onInitiateIntervention={() => setActiveSection('intervention-center')}
+                  />
+                )}
+                {activeSection === 'intervention-center' && (
+                  <InterventionCenter
+                    mentorId={effectiveMentorId}
+                    mentorName={user.name}
+                    onViewStudent360={(stId) => setSelectedStudent360Id(stId)}
+                    actorId={effectiveActorId}
+                  />
+                )}
+                {activeSection === 'recommendations' && (
+                  <SmartMentorRecommendations mentorId={effectiveMentorId} onViewStudent360={(stId) => setSelectedStudent360Id(stId)} />
+                )}
+                {activeSection === 'meetings' && (
+                  <MeetingScheduler userRole={user.role} userId={effectiveMentorId} userName={user.name} />
+                )}
+                {activeSection === 'tasks' && (
+                  <FollowUpTaskManager userRole={user.role} userId={effectiveMentorId} userName={user.name} />
+                )}
+                {activeSection === 'resources' && (
+                  <CentralResourceLibrary userRole={user.role} userId={effectiveMentorId} userName={user.name} department={user.department} />
+                )}
+                {activeSection === 'safety-alerts' && (
+                  <AISafetyAlertsDashboard mentorId={effectiveMentorId} actorId={effectiveActorId} />
+                )}
+              </>
+            );
+          })()}
 
           {/* STUDENT PORTAL SECTIONS */}
           {user.role === 'student' && studentProfile && (
