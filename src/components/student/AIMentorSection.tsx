@@ -60,6 +60,7 @@ export const AIMentorSection: React.FC<AIMentorSectionProps> = ({ student }) => 
         mentorId: student.mentorId || undefined,
         studentId: student.id,
         usn: student.usn,
+        department: student.department,
       });
 
       setMessages([...updatedHistory, { role: 'model', text: response.text }]);

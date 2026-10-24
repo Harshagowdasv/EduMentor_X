@@ -69,4 +69,9 @@ node_modules/
 .dataconnect
 
 
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
 server/firebase-service-account.json

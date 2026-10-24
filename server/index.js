@@ -348,7 +348,7 @@ app.post('/api/ai/chat', async (req, res) => {
     }
     aiRateLimitMap.set(uid, nowTime);
 
-    const { message, history } = req.body;
+    const { message, history, studentContext } = req.body;
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'message string is required in request body.' });
     }
@@ -374,15 +374,15 @@ app.post('/api/ai/chat', async (req, res) => {
       console.warn(`[AI Context Fetch Notice]: Firestore student context read notice for UID (${uid}): ${err.message}. Using safe default context.`);
     }
 
-    const studentName = studentData.name || decodedToken.name || 'Student';
-    const department = studentData.department || 'Computer Science & Engineering';
-    const cgpa = typeof studentData.cgpa === 'number' ? studentData.cgpa : 8.0;
-    const attendance = typeof studentData.attendance === 'number' ? studentData.attendance : 85;
+    const studentName = studentData.name || studentContext?.name || decodedToken.name || 'Student';
+    const department = studentData.department || studentContext?.department || 'Computer Science & Engineering';
+    const cgpa = typeof studentData.cgpa === 'number' ? studentData.cgpa : (typeof studentContext?.cgpa === 'number' ? studentContext.cgpa : 8.0);
+    const attendance = typeof studentData.attendance === 'number' ? studentData.attendance : (typeof studentContext?.attendance === 'number' ? studentContext.attendance : 85);
     const studyHours = studentData.studyHours || 15;
     const backlogs = studentData.previousYearBacklogs || studentData.currentBacklogs || 0;
     const academicStatus = studentData.academicStatus || 'Active';
-    const mentorName = studentData.mentorName || 'Faculty Mentor';
-    const mentorId = studentData.mentorId || null;
+    const mentorName = studentData.mentorName || studentContext?.assignedMentorName || 'Faculty Mentor';
+    const mentorId = studentData.mentorId || studentContext?.mentorId || null;
     const careerGoal = studentData.careerGoal || 'Software Engineer';
     const skills = studentData.skills ? (Array.isArray(studentData.skills) ? studentData.skills.join(', ') : String(studentData.skills)) : 'General Technical Skills';
 
@@ -488,7 +488,7 @@ Guidelines:
     };
 
     // Candidate supported Gemini models in order of preference
-    const geminiCandidateModels = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite'];
+    const geminiCandidateModels = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
 
     let responseText = null;
     let lastErrorMsg = '';
@@ -497,7 +497,7 @@ Guidelines:
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${GEMINI_API_KEY}`;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         let geminiRes = await fetch(url, {
           method: 'POST',
@@ -511,7 +511,7 @@ Guidelines:
           console.warn(`[Gemini API Warning]: Model ${modelName} returned HTTP 503. Retrying in 250ms...`);
           await new Promise((r) => setTimeout(r, 250));
           const retryController = new AbortController();
-          const retryTimeoutId = setTimeout(() => retryController.abort(), 20000);
+          const retryTimeoutId = setTimeout(() => retryController.abort(), 10000);
           geminiRes = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

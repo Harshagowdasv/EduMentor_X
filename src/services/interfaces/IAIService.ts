@@ -32,6 +32,7 @@ export interface IAIService {
       mentorId?: string;
       studentId: string;
       usn: string;
+      department?: string;
     }
   ): Promise<AIResponse>;
 
