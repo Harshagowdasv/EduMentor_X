@@ -71,20 +71,21 @@ export class AIServiceImpl implements IAIService {
           };
         }
       } else {
-        const errData = await response.json().catch(() => ({}));
+        const fallback = this.generateLocalAIResponse(studentMessage, studentContext);
         return {
-          text: errData.error || 'AI Mentor is temporarily unavailable. Please try again.',
-          emotion: 'concerned',
+          text: fallback.text,
+          emotion: fallback.emotion,
           safety: safetyAssessment,
         };
       }
     } catch (err) {
-      console.error('[AI Service Error]:', err);
+      console.warn('[AI Service Network/Server Notice, using local fallback]:', err);
     }
 
+    const fallbackResponse = this.generateLocalAIResponse(studentMessage, studentContext);
     return {
-      text: 'AI Mentor is temporarily unavailable. Please try again.',
-      emotion: 'concerned',
+      text: fallbackResponse.text,
+      emotion: fallbackResponse.emotion,
       safety: safetyAssessment,
     };
   }

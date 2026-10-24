@@ -16,6 +16,7 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
   const [duplicateStrategy, setDuplicateStrategy] = useState<'skip' | 'update' | 'cancel'>('skip');
   const [isProcessing, setIsProcessing] = useState(false);
   const [importResult, setImportResult] = useState<CSVImportResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadHistory();
@@ -83,6 +84,7 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setErrorMessage(null);
 
     Papa.parse<CSVStudentRow>(file, {
       header: true,
@@ -91,19 +93,24 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
         setCsvRows(results.data);
         setImportResult(null);
       },
+      error: (err) => {
+        setErrorMessage(`Failed to parse CSV file: ${err.message}`);
+      },
     });
   };
 
   const handleExecuteImport = async () => {
     if (csvRows.length === 0) return;
     setIsProcessing(true);
+    setErrorMessage(null);
 
     try {
       const result = await dbService.importStudentsCSV(csvRows, actorId, duplicateStrategy);
       setImportResult(result);
       await loadHistory();
-    } catch (err) {
+    } catch (err: any) {
       console.error('CSV Import Execution Error:', err);
+      setErrorMessage(err?.message || 'Failed to import student CSV records. Please check the file formatting and retry.');
     } finally {
       setIsProcessing(false);
     }
@@ -156,6 +163,14 @@ export const AdvancedCSVImportWizard: React.FC<AdvancedCSVImportWizardProps> = (
               <p className="text-xs font-bold text-white">Choose CSV File to Import</p>
               <input type="file" accept=".csv" onChange={handleFileUpload} className="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer max-w-full" />
             </div>
+
+            {/* Error Banner */}
+            {errorMessage && (
+              <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2.5">
+                <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
             {/* Config duplicate strategy */}
             {csvRows.length > 0 && (

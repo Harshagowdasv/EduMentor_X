@@ -25,6 +25,7 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
   const [duplicateStrategy, setDuplicateStrategy] = useState<'skip' | 'update' | 'cancel'>('skip');
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState<CSVImportResult | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
   const handleFileChange = (selectedFile: File) => {
     setFile(selectedFile);
     setResult(null);
+    setErrorMessage(null);
 
     Papa.parse<Record<string, any>>(selectedFile, {
       header: true,
@@ -45,6 +47,7 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
       },
       error: (err) => {
         console.error('CSV Parse Error:', err);
+        setErrorMessage(`Failed to parse CSV file: ${err.message}`);
       },
     });
   };
@@ -128,14 +131,16 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
   const handleProcessImport = async () => {
     if (rawParsedData.length === 0) return;
     setImporting(true);
+    setErrorMessage(null);
     try {
       const importResult = await dbService.importStudentsCSV(rawParsedData, actorId, duplicateStrategy);
       setResult(importResult);
       if (importResult.successfulCount > 0 || importResult.updatedCount > 0) {
         onSuccess();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('CSV import execution error:', err);
+      setErrorMessage(err?.message || 'Failed to import student CSV records. Please check the file formatting and retry.');
     } finally {
       setImporting(false);
     }
@@ -179,6 +184,14 @@ export const CSVImportModal: React.FC<CSVImportModalProps> = ({
             <Download className="w-4 h-4 text-indigo-400" /> Download Canonical Template CSV
           </button>
         </div>
+
+        {/* Error Banner */}
+        {errorMessage && (
+          <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2.5">
+            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
 
         {/* Drag & Drop Box */}
         {!result && (
